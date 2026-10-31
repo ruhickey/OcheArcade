@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Oche Arcade">
+  <meta name="theme-color" content="#26332f">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='23' fill='%2326332f'/%3E%3Ccircle cx='24' cy='24' r='14' fill='%23efede3'/%3E%3Ccircle cx='24' cy='24' r='6' fill='%23e0483c'/%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/bowlby-one-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+  <title>Oche Arcade</title>
+</head>
+<body>
+  <section id="players" class="setup" hidden>
+    <form id="players-form" class="setup-card">
+      <h1>Who’s playing?</h1>
+      <div id="name-fields" class="name-fields"></div>
+      <div class="setup-actions">
+        <button type="button" id="remove-player" class="btn">Remove player</button>
+        <button type="button" id="add-player" class="btn">Add player</button>
+      </div>
+      <button type="submit" class="btn btn-primary btn-large">Choose a game</button>
+      <p class="feed-line"><span class="feed-dot"></span><span class="feed-text"></span></p>
+    </form>
+  </section>
+
+  <section id="menu" class="menu" hidden>
+    <header class="menu-head">
+      <h1>Oche Arcade</h1>
+      <ul id="roster" class="roster-names"></ul>
+      <button type="button" id="change-players" class="btn">Change players</button>
+    </header>
+    <div id="game-list" class="game-list"></div>
+    <p class="feed-line"><span class="feed-dot"></span><span class="feed-text"></span></p>
+  </section>
+
+  <section id="setup" class="setup" hidden>
+    <div class="setup-card">
+      <div class="setup-title">
+        <div id="setup-mat" class="setup-mat"></div>
+        <h1 id="setup-name"></h1>
+      </div>
+      <p id="setup-blurb" class="setup-intro"></p>
+      <div id="setup-options" class="setup-options"></div>
+      <ul id="setup-roster" class="roster-names"></ul>
+      <div class="setup-start">
+        <button type="button" id="start-bull" class="btn btn-primary btn-large">Throw for the bull</button>
+        <button type="button" id="start-order" class="btn btn-large">Use player order</button>
+      </div>
+      <button type="button" id="setup-back" class="btn">Back to games</button>
+    </div>
+  </section>
+
+  <section id="bull" class="setup" hidden>
+    <div class="setup-card">
+      <p id="bull-eyebrow" class="eyebrow"></p>
+      <h1 id="bull-title"></h1>
+      <p id="bull-message" class="setup-intro" role="status"></p>
+      <ol id="bull-entrants" class="scores"></ol>
+      <div id="bull-teams" class="bull-teams"></div>
+      <div id="bull-hand" class="bull-hand"></div>
+      <div class="controls">
+        <button id="bull-start" class="btn btn-primary btn-large">Start game</button>
+        <button id="bull-next" class="btn">Next player</button>
+        <button id="bull-undo" class="btn">Undo dart</button>
+        <button id="bull-cancel" class="btn">Cancel</button>
+      </div>
+      <p class="feed-line"><span class="feed-dot"></span><span class="feed-text"></span></p>
+    </div>
+  </section>
+
+  <main id="game" class="game" hidden>
+    <div id="stage" class="board-wrap"></div>
+    <aside class="panel">
+      <header class="turn">
+        <h2 id="turn-name"></h2>
+        <div id="dart-pips" class="pips"></div>
+        <p id="message" class="message" role="status"></p>
+      </header>
+      <ol id="scores" class="scores"></ol>
+      <div class="controls">
+        <button id="next" class="btn btn-primary">Next player</button>
+        <button id="undo" class="btn">Undo dart</button>
+        <button id="hand-open" class="btn">Enter by hand</button>
+        <button id="sound" class="btn" hidden></button>
+        <button id="quit" class="btn">Quit</button>
+      </div>
+      <p class="feed-line"><span class="feed-dot"></span><span class="feed-text"></span></p>
+    </aside>
+    <div id="manual" class="manual" hidden>
+      <div class="manual-head">
+        <h3>Enter a dart by hand</h3>
+        <button id="hand-close" class="btn">Done</button>
+      </div>
+      <div id="bed-buttons" class="bed-buttons"></div>
+    </div>
+  </main>
+
+  <div id="winner" class="winner" hidden>
+    <div class="winner-card">
+      <h2 id="winner-name"></h2>
+      <ol id="winner-standings" class="winner-standings"></ol>
+      <div class="winner-actions">
+        <button id="rematch" class="btn btn-primary btn-large">Rematch</button>
+        <button id="winner-quit" class="btn btn-large">Change game</button>
+        <button id="winner-undo" class="btn">Undo last dart</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="quit-dialog" class="quit-dialog" aria-labelledby="quit-title">
+    <div class="quit-card">
+      <h2 id="quit-title">Quit this game?</h2>
+      <p class="setup-intro">The scores from this game won’t be kept.</p>
+      <div class="quit-actions">
+        <button id="quit-cancel" class="btn btn-primary btn-large">Keep playing</button>
+        <button id="quit-confirm" class="btn btn-large">Quit game</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

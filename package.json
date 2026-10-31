@@ -1,0 +1,13 @@
+{
+  "name": "oche-arcade",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js",
+    "sim": "node sim/board.js --auto",
+    "test": "node --test"
+  }
+}

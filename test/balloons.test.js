@@ -253,3 +253,21 @@ test('time running out on the last turn with no darts ends the match', (t) => {
   clock.advance(PREP_MS + TURN_MS + 1000);
   assert.equal(tick(game).phase, 'over');
 });
+
+test('a dart thrown before the buzzer but arriving on the next turn counts for nobody', (t) => {
+  const { game, clock } = setup(t);
+  clock.advance(PREP_MS + TURN_MS + 1000);
+  const next = tick(game);
+  assert.equal(next.current, 1);
+  clock.advance(300);
+  const { x, y } = next.bubbles[0];
+  assert.equal(throwDart(next, dartAt(x, y, clock.now - 700)), next);
+  assert.equal(throwDart(next, dartAt(x, y, clock.now)).players[1].points > 0, true);
+});
+
+test('with no clock, no dart is treated as coming from an earlier turn', (t) => {
+  const { game, clock } = setup(t, ['A', 'B'], { clock: 'No clock' });
+  const after = endTurn(throwDart(game, missDart()));
+  const { x, y } = after.bubbles[0];
+  assert.ok(throwDart(after, dartAt(x, y, clock.now - 700)).players[1].points > 0);
+});

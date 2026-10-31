@@ -27,6 +27,7 @@ const PHASE_SOUND = { takeout: 'takeout', over: 'win' };
 let state = null;
 let soundPhase = null;
 let lockedAtPress = false;
+let activeModule = null;
 let roster = loadNames();
 let view = roster ? 'menu' : 'players'; // players | menu | setup
 let chosenGame = null;
@@ -55,6 +56,12 @@ function resetAnimations() {
 }
 
 /* Rendering */
+
+// Lets a game with its own clock stop drawing, and sounding, once it's off the screen.
+function leaveGame() {
+  activeModule?.stop?.();
+  activeModule = null;
+}
 
 // Only games that have had their sounds chosen show the button.
 function renderSound() {
@@ -297,6 +304,7 @@ function render() {
   if (!game) {
     $('winner').hidden = true;
     resetAnimations();
+    leaveGame();
     renderedSeq = null;
     renderedKey = '';
     if (view === 'menu') renderMenu();
@@ -310,6 +318,8 @@ function render() {
 
   if (isNewGame || renderedSeq === null) {
     resetAnimations();
+    leaveGame();
+    activeModule = module;
     const { rules } = games[game.type];
     $('game').dataset.type = game.type;
     const manual = $('bed-buttons');

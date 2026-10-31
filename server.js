@@ -41,6 +41,7 @@ const STATIC_FILES = {
   '/games/circuit.js': ['games/circuit.js', 'text/javascript; charset=utf-8'],
   '/games/pool.js': ['games/pool.js', 'text/javascript; charset=utf-8'],
   '/games/circuit-rules.js': ['games/circuit-rules.js', 'text/javascript; charset=utf-8'],
+  '/games/snooker-rules.js': ['games/snooker-rules.js', 'text/javascript; charset=utf-8'],
   '/games/dartboard.js': ['games/dartboard.js', 'text/javascript; charset=utf-8'],
   '/games/snooker.js': ['games/snooker.js', 'text/javascript; charset=utf-8'],
   '/games/boxing.js': ['games/boxing.js', 'text/javascript; charset=utf-8'],
@@ -95,8 +96,11 @@ function applyDart(dart) {
     return;
   }
   if (!game || game.phase !== 'throwing') return;
-  history.push(game);
-  game = GAMES[game.type].throwDart(game, dart);
+  const updated = GAMES[game.type].throwDart(game, dart);
+  if (updated !== game) {
+    history.push(game);
+    game = updated;
+  }
 }
 
 // Games can replace the normal move to the next player.
@@ -123,12 +127,13 @@ async function pollBoard() {
       changed = true;
     }
     if (game || setup) {
-      for (const dart of darts) {
-        applyDart({ ...dartFromThrow(dart), at: Date.now() - FEED_DELAY_MS });
-        changed = true;
-      }
+      // Any darts that arrive with a clear were thrown after it.
       if (cleared) {
         applyClear();
+        changed = true;
+      }
+      for (const dart of darts) {
+        applyDart({ ...dartFromThrow(dart), at: Date.now() - FEED_DELAY_MS });
         changed = true;
       }
     }
@@ -148,7 +153,10 @@ function readJson(req) {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk;
-      if (body.length > 10_000) reject(new Error('Body too large'));
+      if (body.length > 10_000) {
+        reject(new Error('Body too large'));
+        req.destroy();
+      }
     });
     req.on('end', () => {
       try {

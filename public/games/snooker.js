@@ -1,17 +1,8 @@
 import { buildPad } from './pad.js';
+import { BLACK, COLOURS, NOMINATE_TAP } from './snooker-rules.js';
 
 const MOVE_MS = 350;
-const BLACK = 25;
 const RED_ROWS = [[1], [2, 3], [4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14, 15]];
-const COLOURS = [
-  { number: 16, name: 'Yellow', value: 2 },
-  { number: 17, name: 'Green', value: 3 },
-  { number: 18, name: 'Brown', value: 4 },
-  { number: 19, name: 'Blue', value: 5 },
-  { number: 20, name: 'Pink', value: 6 },
-  { number: BLACK, name: 'Black', value: 7 },
-];
-const NOMINATE_TAP = 'Tap on the iPad';
 
 let els = null;
 let nominateColour = null;

@@ -1,6 +1,6 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { matches } from '../public/games/circuit-rules.js';
-import { TURN_MS, elapsedMs, freshClock, isExpired, startedClock } from '../public/games/turn-clock.js';
+import { TURN_MS, elapsedMs, freshClock, isExpired, isFromEarlierTurn, startedClock } from '../public/games/turn-clock.js';
 
 export const WIRES = 3;
 export const DIFFICULTY = {
@@ -81,6 +81,7 @@ export function throwDart(game, dart) {
 
   const now = Date.now();
   const landed = dart.at ?? now;
+  if (isFromEarlierTurn(game.clock, landed)) return game;
   const clock = startedClock(game.clock, now);
   const ms = elapsedMs(clock, landed);
   const tooLate = ms > TURN_MS;

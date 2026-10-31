@@ -218,3 +218,9 @@ test('the last player finishing the last hole ends the game on the third dart', 
   assert.equal(game.players[0].total, 0);
   assert.equal(game.last.hatTrick, true);
 });
+
+test('a hat trick needs all three darts on the number, not just the same kind of bed', () => {
+  const game = throwAll(newGame(['A', 'B']), makeDart('Triple', 1), makeDart('Triple', 20), makeDart('Triple', 2));
+  assert.equal(game.last.hatTrick, false);
+  assert.equal(endTurn(game).players[0].total, 1);
+});

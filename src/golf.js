@@ -31,8 +31,7 @@ function strokesFor(dart, hole) {
 // Three darts in the same bed of the target take one off the hole.
 function isHatTrick(darts) {
   return darts.length === DARTS_PER_TURN
-    && darts[0].strokes !== MISS_SCORE
-    && darts.every((dart) => dart.id === darts[0].id);
+    && darts.every((dart) => dart.strokes !== MISS_SCORE && dart.id === darts[0].id);
 }
 
 export function holeScore(darts) {

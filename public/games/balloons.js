@@ -140,6 +140,13 @@ export default {
     this.sync(game);
   },
 
+  stop() {
+    cancelAnimationFrame(frame);
+    frame = null;
+    current = null;
+    shownSeconds = null;
+  },
+
   sync(game) {
     current = game;
     els.round.textContent = roundText(game);

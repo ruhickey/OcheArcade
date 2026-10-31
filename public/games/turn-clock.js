@@ -14,7 +14,12 @@ export function elapsedMs(clock, at) {
 
 export function freshClock(now, heldMs = 0) {
   const prepUntil = now + PREP_MS;
-  return { startsAt: prepUntil - heldMs, prepUntil, heldMs, frozen: false };
+  return { turnStart: now, startsAt: prepUntil - heldMs, prepUntil, heldMs, frozen: false };
+}
+
+// A dart still on its way from the camera when the turn changed belongs to nobody.
+export function isFromEarlierTurn(clock, at) {
+  return at < clock.turnStart;
 }
 
 // Throwing during the countdown starts the clock straight away.

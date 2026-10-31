@@ -55,6 +55,14 @@ test('bad options are refused', { skip }, () => {
   }
 });
 
+test('a dry run refuses to uninstall, in either order', { skip }, () => {
+  for (const args of [['--uninstall', '--dry-run'], ['--dry-run', '--uninstall']]) {
+    const { status, stderr } = run(...args, '--platform', 'linux');
+    assert.equal(status, 1, args.join(' '));
+    assert.match(stderr, /can't be used with --uninstall/);
+  }
+});
+
 test('unsupported systems get a clear message', { skip }, () => {
   const { status, stderr } = run('--dry-run', '--platform', 'plan9');
   assert.equal(status, 1);

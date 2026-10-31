@@ -5,14 +5,16 @@ export function isFinalTurn(game) {
   return game.round === game.rounds && game.current === game.players.length - 1;
 }
 
-function leaders(players, score) {
-  const best = Math.max(...players.map(score));
-  return players.map((_, i) => i).filter((i) => score(players[i]) === best);
+function leaders(players, entrants, score) {
+  const best = Math.max(...entrants.map((i) => score(players[i])));
+  return entrants.filter((i) => score(players[i]) === best);
 }
 
 // With the scores level, the leaders each throw another turn until one is ahead.
+// A playoff is only between its own players, even if their scores drop below someone else's.
 function finishOrPlayoff(game, { score, winnerText, startTurn }) {
-  const top = leaders(game.players, score);
+  const entrants = game.playoff?.queue ?? game.players.map((_, i) => i);
+  const top = leaders(game.players, entrants, score);
   if (top.length > 1) {
     return startTurn({
       ...game,

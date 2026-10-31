@@ -1,22 +1,12 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { arrange, sideOf, sideWinsText, turnOrderFor } from './teams.js';
+import { BLACK, COLOURS, NOMINATE_TAP } from '../public/games/snooker-rules.js';
 
-export { arrange };
+export { arrange, BLACK, COLOURS, NOMINATE_TAP };
 
 export const RED_COUNT = 15;
 export const RED_VALUE = 1;
 export const MIN_FOUL = 4;
-export const BLACK = 25;
-// In playing order. The number is what you throw at, and 25 is either bull.
-export const COLOURS = [
-  { number: 16, name: 'Yellow', value: 2 },
-  { number: 17, name: 'Green', value: 3 },
-  { number: 18, name: 'Brown', value: 4 },
-  { number: 19, name: 'Blue', value: 5 },
-  { number: 20, name: 'Pink', value: 6 },
-  { number: BLACK, name: 'Black', value: 7 },
-];
-export const NOMINATE_TAP = 'Tap on the iPad';
 export const NOMINATE_ANY = 'Any colour counts';
 export const NOMINATE_CHOICES = [NOMINATE_TAP, NOMINATE_ANY];
 

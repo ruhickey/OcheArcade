@@ -1,5 +1,6 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { arrange, sideNames, sideOf, turnOrderFor } from './teams.js';
+import { shuffled } from './shuffle.js';
 
 export { arrange };
 
@@ -16,15 +17,6 @@ const SINGLE_BEDS = ['SingleInner', 'SingleOuter'];
 const NUMBER_BEDS = [...SINGLE_BEDS, ...TOUGH_BEDS];
 const BULL_BEDS = ['InnerBull', 'OuterBull'];
 const NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
-
-function shuffled(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
 
 function rack(numbers, toughCount) {
   const tough = new Set(shuffled(numbers).slice(0, toughCount));

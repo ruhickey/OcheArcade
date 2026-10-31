@@ -102,6 +102,12 @@ export default {
     this.sync(game);
   },
 
+  stop() {
+    cancelAnimationFrame(frame);
+    frame = null;
+    current = null;
+  },
+
   sync(game) {
     current = game;
     const target = game.wires[Math.min(game.wire, game.wires.length - 1)];

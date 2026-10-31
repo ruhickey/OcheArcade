@@ -238,3 +238,20 @@ test('one player can defuse alone', (t) => {
   after = throwDart(after, single(3));
   assert.equal(after.winner, true);
 });
+
+test('a dart thrown before the buzzer but arriving on the next turn counts for nobody', (t) => {
+  const s = setup(t);
+  s.advance(PREP_MS + TURN_MS + 1000);
+  const next = tick(fixed(s.game));
+  assert.equal(next.current, 1);
+  const livesLeft = next.lives;
+
+  s.advance(300);
+  const late = { ...single(2), at: s.now - 700 };
+  assert.equal(throwDart(next, late), next);
+  assert.equal(next.lives, livesLeft);
+
+  const real = throwDart(fixed(next), { ...single(1), at: s.now });
+  assert.equal(real.darts.length, 1);
+  assert.equal(real.last.player, 1);
+});

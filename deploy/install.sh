@@ -38,6 +38,7 @@ done
 
 [[ $port =~ ^[0-9]+$ ]] && (( port >= 1 && port <= 65535 )) || fail "--port must be a number from 1 to 65535"
 [[ $board_url =~ ^https?://[^[:space:]\"\'\<\>\&]+$ ]] || fail "--board-url must look like http://localhost:3180"
+if $dry_run && $uninstall; then fail "--dry-run only previews an install, so it can't be used with --uninstall"; fi
 
 app_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # Under sudo, the service should still run as the person who asked for it.

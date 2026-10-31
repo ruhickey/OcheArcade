@@ -1,4 +1,5 @@
 import { DARTS_PER_TURN } from './turns.js';
+import { shuffled } from './shuffle.js';
 
 export const TARGET_CHOICES = [2, 3];
 export const DEFAULT_TARGETS = 3;
@@ -11,15 +12,6 @@ export const DEFAULT_DIFFICULTY = 'Normal';
 
 const BED_POWER = { SingleInner: 1, SingleOuter: 1, Double: 2, Triple: 3 };
 const NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
-
-function shuffled(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
 
 export function newGame(names, { targets = DEFAULT_TARGETS, difficulty = DEFAULT_DIFFICULTY } = {}) {
   const { lives, damageScale } = DIFFICULTY[difficulty];

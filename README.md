@@ -1,6 +1,23 @@
 # Oche Arcade
 
+**Disclaimer: This entire codebase is vibe-coded.**
+
 Darts arcade games served from any machine that can reach an Autodarts Board Manager, and played in a browser on a tablet or computer on the same network. It has no dependencies and needs Node 18 or newer.
+
+![The game menu, showing all 12 games as beer mats](docs/screenshots/menu.webp)
+
+## Games
+
+| | | |
+|---|---|---|
+| ![Snakes & Ladders](docs/screenshots/snakes.webp)<br>**Snakes & Ladders** | ![Tug of War](docs/screenshots/tug.webp)<br>**Tug of War** | ![Golf](docs/screenshots/golf.webp)<br>**Golf** |
+| ![Paintball](docs/screenshots/paintball.webp)<br>**Paintball** | ![Balloons](docs/screenshots/balloons.webp)<br>**Balloons** | ![Snooker](docs/screenshots/snooker.webp)<br>**Snooker** |
+| ![Boxing](docs/screenshots/boxing.webp)<br>**Boxing** | ![Four in a Row](docs/screenshots/fourinarow.webp)<br>**Four in a Row** | ![Heist](docs/screenshots/heist.webp)<br>**Heist** |
+| ![Conquer](docs/screenshots/conquer.webp)<br>**Conquer** | ![Circuit Breaker](docs/screenshots/circuit.webp)<br>**Circuit Breaker** | ![8 Ball Pool](docs/screenshots/pool.webp)<br>**8 Ball Pool** |
+
+Each game has its own setup screen for its options and who throws first.
+
+![The Boxing setup screen, with target numbers, difficulty and throw for the bull](docs/screenshots/setup.webp)
 
 ## Run
 

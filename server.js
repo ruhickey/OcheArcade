@@ -6,7 +6,7 @@ import { createFeedTracker } from './src/feed.js';
 import { bedById, dartFromThrow, makeDart } from './src/segments.js';
 import { GAMES } from './src/games.js';
 import { BOARD_COMMANDS, boardFromState, sameBoard, sendBoardCommand, unreachableBoard } from './src/board.js';
-import { advance, newBullOff, rankedNames, throwDart as throwBullDart } from './src/bulloff.js';
+import { advance, newBullOff, rankedPlayers, throwDart as throwBullDart } from './src/bulloff.js';
 import { DARTS_PER_TURN, boardCleared, nextPlayer } from './src/turns.js';
 
 const PORT = Number(process.env.PORT ?? 8090);
@@ -60,21 +60,21 @@ let board = unreachableBoard('Waiting for Board Manager');
 const clients = new Set();
 
 // Seats the ranked players the way their game wants them.
-function arrangedNames() {
+function arrangedPlayers() {
   const definition = GAMES[setup.type];
-  const ranked = rankedNames(setup.bullOff);
+  const ranked = rankedPlayers(setup.bullOff);
   return definition.arrange ? definition.arrange(ranked) : ranked;
 }
 
 function setupView() {
   if (!setup) return null;
   const done = setup.bullOff.phase === 'done';
-  const preview = done ? GAMES[setup.type].newGame(arrangedNames(), setup.options).players : null;
+  const preview = done ? GAMES[setup.type].newGame(arrangedPlayers(), setup.options).players : null;
   return { ...setup, preview };
 }
 
-function startGame(definition, names, options) {
-  game = { ...definition.newGame(names, options), options };
+function startGame(definition, players, options) {
+  game = { ...definition.newGame(players, options), options };
   setup = null;
   history = [];
 }
@@ -178,29 +178,32 @@ function cleanOptions(definition, options) {
 }
 
 // Returns the checked game definition and players, or an error message.
-function checkNewGame(type, names) {
+function checkNewGame(type, players) {
   const definition = Object.hasOwn(GAMES, type) ? GAMES[type] : null;
   if (!definition) return { error: 'Unknown game' };
-  const cleaned = cleanNames(names);
+  const cleaned = cleanPlayers(players);
   if (!cleaned || cleaned.length < definition.minPlayers) {
     return { error: `${definition.name} needs ${definition.minPlayers} to ${MAX_PLAYERS} players` };
   }
-  return { definition, names: cleaned };
+  return { definition, players: cleaned };
 }
 
-function cleanNames(names) {
-  if (!Array.isArray(names) || names.length < 1 || names.length > MAX_PLAYERS) return null;
-  return names.map((name, i) => String(name ?? '').trim().slice(0, MAX_NAME_LENGTH) || `Player ${i + 1}`);
+function cleanPlayers(players) {
+  if (!Array.isArray(players) || players.length < 1 || players.length > MAX_PLAYERS) return null;
+  return players.map((player, i) => ({
+    name: String(player?.name ?? '').trim().slice(0, MAX_NAME_LENGTH) || `Player ${i + 1}`,
+    beginner: player?.beginner === true,
+  }));
 }
 
 const ACTIONS = {
-  '/api/new': ({ type, names, options }) => {
-    const { error, definition, names: cleaned } = checkNewGame(type, names);
+  '/api/new': ({ type, players, options }) => {
+    const { error, definition, players: cleaned } = checkNewGame(type, players);
     if (error) return error;
     startGame(definition, cleaned, cleanOptions(definition, options));
   },
-  '/api/bull': ({ type, names, options }) => {
-    const { error, definition, names: cleaned } = checkNewGame(type, names);
+  '/api/bull': ({ type, players, options }) => {
+    const { error, definition, players: cleaned } = checkNewGame(type, players);
     if (error) return error;
     game = null;
     setup = { type, options: cleanOptions(definition, options), bullOff: newBullOff(cleaned) };
@@ -208,7 +211,7 @@ const ACTIONS = {
   },
   '/api/bull/start': () => {
     if (!setup || setup.bullOff.phase !== 'done') return 'Throw for the bull is not finished';
-    startGame(GAMES[setup.type], arrangedNames(), setup.options);
+    startGame(GAMES[setup.type], arrangedPlayers(), setup.options);
   },
   '/api/dart': ({ bed, number = 0, x, y }) => {
     if (!bedById(bed)) return 'Unknown bed';

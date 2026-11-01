@@ -1,5 +1,6 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { arrange, sideOf, sideWinsText, turnOrderFor } from './teams.js';
+import { toPlayer } from './players.js';
 
 export { arrange };
 
@@ -18,7 +19,7 @@ export function columnFor(dart) {
 export function newGame(names) {
   return {
     type: 'fourinarow',
-    players: names.map((name, i) => ({ name, side: sideOf(i, names.length) })),
+    players: names.map(toPlayer).map((player, i) => ({ ...player, side: sideOf(i, names.length) })),
     current: 0,
     turnOrder: turnOrderFor(names.length),
     turnStep: 0,

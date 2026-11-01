@@ -1,6 +1,7 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { matches } from '../public/games/circuit-rules.js';
 import { TURN_MS, elapsedMs, freshClock, isExpired, isFromEarlierTurn, startedClock } from '../public/games/turn-clock.js';
+import { toPlayer } from './players.js';
 
 export const WIRES = 3;
 export const DIFFICULTY = {
@@ -42,7 +43,7 @@ export function newGame(names, { difficulty = DEFAULT_DIFFICULTY, bombs = DEFAUL
   return {
     type: 'circuit',
     difficulty,
-    players: names.map((name) => ({ name, cuts: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, cuts: 0 })),
     current: 0,
     lives,
     maxLives: lives,
@@ -86,9 +87,12 @@ export function throwDart(game, dart) {
   const ms = elapsedMs(clock, landed);
   const tooLate = ms > TURN_MS;
   const target = game.wires[game.wire];
-  const hit = !tooLate && matches(target, dart.id, dart.number);
+  const { beginner } = game.players[game.current];
+  const hit = !tooLate && matches(target, dart.id, dart.number, beginner);
+  // A beginner's first miss of a turn is free, as long as it's in time.
+  const spared = beginner && !hit && !tooLate && game.darts.every((earlier) => earlier.hit);
 
-  const darts = [...game.darts, { name: dart.name, hit }];
+  const darts = [...game.darts, { name: dart.name, hit, spared }];
   const full = darts.length >= DARTS_PER_TURN;
   const base = {
     ...game,
@@ -96,7 +100,7 @@ export function throwDart(game, dart) {
     phase: full || tooLate ? 'takeout' : 'throwing',
     clock: { ...clock, heldMs: Math.min(ms, TURN_MS), frozen: full || tooLate },
     seq: game.seq + 1,
-    last: { player: game.current, name: dart.name, hit, tooLate, target },
+    last: { player: game.current, name: dart.name, hit, tooLate, spared, target },
   };
 
   if (hit) {
@@ -104,6 +108,7 @@ export function throwDart(game, dart) {
     const cut = cutWire(game);
     return { ...base, players, ...cut, last: { ...base.last, defusedBomb: cut.wire === 0 || cut.wire === WIRES } };
   }
+  if (spared) return base;
   const { lives, over } = explode(game);
   return { ...base, lives, ...over };
 }

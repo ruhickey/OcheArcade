@@ -3,6 +3,7 @@ import { art, reducedMotion } from './art.js';
 const HOLES = 18;
 const MOVE_MS = 300;
 const MISS_STROKES = 7;
+const BEGINNER_MISS_STROKES = 5;
 const BALL_START = '10%';
 const BALL_HOLE = '44%';
 const MANUAL_BEDS = [
@@ -15,6 +16,7 @@ const MANUAL_BEDS = [
 
 let els = null;
 let currentHole = 1;
+let manualMiss = null;
 
 // Playoff results replace the card, which is finished with by then.
 function playoffTable(game) {
@@ -64,7 +66,7 @@ function cell(tag, text, className) {
 
 function scoreClass(score) {
   if (score <= 1) return 'golf-great';
-  return score === 7 ? 'golf-bad' : '';
+  return score >= BEGINNER_MISS_STROKES ? 'golf-bad' : '';
 }
 
 const sum = (scores) => scores.reduce((total, score) => total + score, 0);
@@ -136,6 +138,7 @@ export default {
 
   sync(game) {
     currentHole = game.hole;
+    manualMiss.textContent = game.players[game.current].beginner ? BEGINNER_MISS_STROKES : MISS_STROKES;
     els.target.textContent = game.hole;
     els.label.textContent = game.playoff ? 'Playoff' : 'Hole';
     els.hint.textContent = hintText(game);
@@ -146,7 +149,7 @@ export default {
   async animate(game) {
     this.sync(game);
     // A dart on target rolls the ball into the hole.
-    if (game.last.strokes !== MISS_STROKES && !reducedMotion()) {
+    if (game.last.strokes < BEGINNER_MISS_STROKES && !reducedMotion()) {
       await els.ball.animate([
         { left: BALL_START, opacity: 1, transform: 'scale(1) rotate(0deg)' },
         { left: BALL_HOLE, opacity: 1, transform: 'scale(1) rotate(300deg)', offset: 0.8 },
@@ -159,7 +162,7 @@ export default {
 
   describe(last) {
     if (last.hatTrick) return `Hat trick! One off, so this hole scores ${last.best}.`;
-    if (last.strokes === 7) return `${last.name}: no good, that’s a 7.`;
+    if (last.strokes >= BEGINNER_MISS_STROKES) return `${last.name}: no good, that’s a ${last.strokes}.`;
     if (last.strokes === 1) return `${last.name}: hole in 1!`;
     return `${last.name}: that’s a ${last.strokes}.`;
   },
@@ -182,6 +185,7 @@ export default {
       label.textContent = text;
       const value = document.createElement('b');
       value.textContent = strokes;
+      if (bed === 'Miss') manualMiss = value;
       button.append(label, value);
       button.addEventListener('click', () => sendDart({ bed, number: currentHole }));
       container.appendChild(button);

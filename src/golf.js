@@ -1,15 +1,18 @@
 import { DARTS_PER_TURN } from './turns.js';
+import { toPlayer } from './players.js';
 
 export const HOLES = 18;
 export const MISS_SCORE = 7;
+export const BEGINNER_MISS_SCORE = 5;
 
-// Strokes for hitting each bed of the hole's number. Anything else costs MISS_SCORE.
+// Strokes for hitting each bed of the hole's number. Anything else is a miss.
 const BED_SCORES = { Triple: 1, Double: 2, SingleInner: 3, SingleOuter: 4 };
+const WORST_ON_TARGET = 4;
 
 export function newGame(names) {
   return {
     type: 'golf',
-    players: names.map((name) => ({ name, holes: [], total: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, holes: [], total: 0 })),
     current: 0,
     hole: 1,
     darts: [],
@@ -23,15 +26,16 @@ export function newGame(names) {
   };
 }
 
-function strokesFor(dart, hole) {
+function strokesFor(dart, hole, beginner) {
   const onTarget = dart.number === hole && Object.hasOwn(BED_SCORES, dart.id);
-  return onTarget ? BED_SCORES[dart.id] : MISS_SCORE;
+  if (onTarget) return BED_SCORES[dart.id];
+  return beginner ? BEGINNER_MISS_SCORE : MISS_SCORE;
 }
 
 // Three darts in the same bed of the target take one off the hole.
 function isHatTrick(darts) {
   return darts.length === DARTS_PER_TURN
-    && darts.every((dart) => dart.strokes !== MISS_SCORE && dart.id === darts[0].id);
+    && darts.every((dart) => dart.strokes <= WORST_ON_TARGET && dart.id === darts[0].id);
 }
 
 export function holeScore(darts) {
@@ -136,7 +140,7 @@ function isFinalTurn(game) {
 export function throwDart(game, dart) {
   if (game.phase !== 'throwing') return game;
 
-  const strokes = strokesFor(dart, game.hole);
+  const strokes = strokesFor(dart, game.hole, game.players[game.current].beginner);
   const darts = [...game.darts, { id: dart.id, name: dart.name, strokes }];
   const full = darts.length >= DARTS_PER_TURN;
   const next = {

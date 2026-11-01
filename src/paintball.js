@@ -1,5 +1,6 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { advance, isFinalTurn } from './rounds.js';
+import { toPlayer } from './players.js';
 
 export const ROUND_CHOICES = [5, 10, 15, 20];
 export const DEFAULT_ROUNDS = 10;
@@ -14,7 +15,7 @@ export function zoneOf(dart) {
 export function newGame(names, { rounds = DEFAULT_ROUNDS } = {}) {
   return {
     type: 'paintball',
-    players: names.map((name) => ({ name, zones: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, zones: 0 })),
     current: 0,
     round: 1,
     rounds,

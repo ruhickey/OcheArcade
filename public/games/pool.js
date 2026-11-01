@@ -20,12 +20,13 @@ function targetText(game) {
   const { balls, potted } = game.sides[side];
   if (potted === BALLS) return '8-Ball: hit the Bull';
   const ball = balls[potted];
-  return ball.tough ? `Double or Triple ${ball.number}` : `Hit ${ball.number}`;
+  return ball.tough && !game.players[game.current].beginner ? `Double or Triple ${ball.number}` : `Hit ${ball.number}`;
 }
 
 function buildRack(game, side) {
   const state = game.sides[side];
   const live = game.phase === 'throwing' && !game.shootout && game.players[game.current].side === side;
+  const easyRack = live && game.players[game.current].beginner;
   const box = document.createElement('div');
   box.className = `pool-side ${SIDE_CLASS[side]}${live ? ' pool-live' : ''}`;
 
@@ -44,7 +45,7 @@ function buildRack(game, side) {
   state.balls.forEach((ball, i) => {
     const el = document.createElement('div');
     const potted = i < state.potted;
-    el.className = `pool-ball${potted ? ' pool-potted' : ''}${live && i === state.potted ? ' pool-now' : ''}${ball.tough ? ' pool-tough' : ''}`;
+    el.className = `pool-ball${potted ? ' pool-potted' : ''}${live && i === state.potted ? ' pool-now' : ''}${ball.tough && !easyRack ? ' pool-tough' : ''}`;
     el.style.setProperty('--ball', `url(${art(`balls/${BALL_SPRITES[i]}`)})`);
     const digits = document.createElement('span');
     digits.textContent = ball.number;
@@ -86,7 +87,7 @@ export default {
 
   sync(game) {
     els.target.textContent = targetText(game);
-    els.legend.hidden = !game.sides.left.balls.some((ball) => ball.tough);
+    els.legend.hidden = !game.sides.left.balls.some((ball) => ball.tough) || game.players[game.current].beginner;
     const sides = game.players.length === 1 ? ['left'] : ['left', 'right'];
     els.table.replaceChildren(...sides.map((side) => buildRack(game, side)));
   },
@@ -101,12 +102,13 @@ export default {
     if (last.eightBall) return `${last.name}: 8-ball down!`;
     if (last.hit) return `${last.name}: potted! Keep going.`;
     if (last.near) return `${last.name}: right number, but it needs a double or triple.`;
+    if (last.spared) return `${last.name}: missed, keep going.`;
     return `${last.name}: missed. Turn over.`;
   },
 
   dartSound(last) {
     if (last.hit) return 'hit';
-    return last.near ? 'near' : 'miss';
+    return last.near || last.spared ? 'near' : 'miss';
   },
 
   pip: (dart) => (dart.hit ? `${dart.name} potted` : `${dart.name} miss`),

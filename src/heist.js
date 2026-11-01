@@ -1,10 +1,13 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { advance, isFinalTurn } from './rounds.js';
+import { toPlayer } from './players.js';
 
 export const ROUND_CHOICES = [3, 5, 10];
 export const DEFAULT_ROUNDS = 5;
 export const MIN_CODE = 10;
 export const MAX_CODE = 50;
+// A beginner cracks the code by finishing this close to zero, either side.
+export const BEGINNER_TOLERANCE = 5;
 
 function randomCode() {
   return MIN_CODE + Math.floor(Math.random() * (MAX_CODE - MIN_CODE + 1));
@@ -37,7 +40,7 @@ const rules = { score: (player) => player.points, winnerText, startTurn };
 export function newGame(names, { rounds = DEFAULT_ROUNDS } = {}) {
   return startTurn({
     type: 'heist',
-    players: names.map((name) => ({ name, points: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, points: 0 })),
     current: 0,
     round: 1,
     rounds,
@@ -52,8 +55,8 @@ export function newGame(names, { rounds = DEFAULT_ROUNDS } = {}) {
   });
 }
 
-function outcome(remaining, dartCount) {
-  if (remaining === 0) return 'looted';
+function outcome(remaining, dartCount, tolerance) {
+  if (Math.abs(remaining) <= tolerance) return 'looted';
   if (remaining < 0) return 'bust';
   return dartCount >= DARTS_PER_TURN ? 'alarm' : null;
 }
@@ -61,10 +64,12 @@ function outcome(remaining, dartCount) {
 export function throwDart(game, dart) {
   if (game.phase !== 'throwing') return game;
 
-  const remaining = game.remaining - dart.points;
+  const left = game.remaining - dart.points;
   const darts = [...game.darts, { name: dart.name, points: dart.points }];
-  const result = outcome(remaining, darts.length);
+  const tolerance = game.players[game.current].beginner ? BEGINNER_TOLERANCE : 0;
+  const result = outcome(left, darts.length, tolerance);
   const looted = result === 'looted';
+  const remaining = looted ? 0 : left;
   const next = {
     ...game,
     remaining,

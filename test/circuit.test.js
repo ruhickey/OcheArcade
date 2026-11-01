@@ -255,3 +255,49 @@ test('a dart thrown before the buzzer but arriving on the next turn counts for n
   assert.equal(real.darts.length, 1);
   assert.equal(real.last.player, 1);
 });
+
+const beginnerWires = [{ kind: 'double', number: 20 }, { kind: 'triple', number: 5 }, { kind: 'odd' }];
+const beginnerFirst = () => fixed(
+  newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]),
+  beginnerWires,
+);
+
+test('any bed of the number cuts a beginner’s wire, but not anyone else’s', () => {
+  assert.equal(throwDart(beginnerFirst(), single(20)).wire, 1);
+  const other = throwDart({ ...beginnerFirst(), current: 1 }, single(20));
+  assert.equal(other.wire, 0);
+  assert.equal(other.last.hit, false);
+});
+
+test('only a beginner’s first miss of a turn is free', () => {
+  const start = beginnerFirst();
+  const first = throwDart(start, single(1));
+  assert.equal(first.lives, start.lives);
+  assert.equal(first.last.spared, true);
+  const second = throwDart(first, single(1));
+  assert.equal(second.lives, start.lives - 1);
+  assert.equal(second.last.spared, false);
+});
+
+test('anyone else’s first miss costs a life', () => {
+  const start = { ...beginnerFirst(), current: 1 };
+  assert.equal(throwDart(start, single(1)).lives, start.lives - 1);
+});
+
+test('a beginner’s free miss comes back the next turn', () => {
+  const miss = single(1);
+  const turn = [miss, miss, miss].reduce(throwDart, beginnerFirst());
+  const next = endTurn(turn);
+  assert.equal(next.darts.length, 0);
+  assert.equal(throwDart({ ...next, current: 0 }, miss).last.spared, true);
+});
+
+test('matches and targetText accept any bed when asked', () => {
+  const target = { kind: 'triple', number: 5 };
+  assert.equal(matches(target, 'SingleOuter', 5), false);
+  assert.equal(matches(target, 'SingleOuter', 5, true), true);
+  assert.equal(matches(target, 'SingleOuter', 6, true), false);
+  assert.equal(targetText(target), 'Triple 5');
+  assert.equal(targetText(target, true), 'Any 5');
+  assert.equal(targetText({ kind: 'odd' }, true), 'Odd');
+});

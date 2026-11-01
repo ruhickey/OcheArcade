@@ -1,12 +1,14 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { arrange, sideOf, sideWinsText, turnOrderFor } from './teams.js';
-import { BLACK, COLOURS, NOMINATE_TAP } from '../public/games/snooker-rules.js';
+import { BLACK, COLOURS, NOMINATE_TAP, anyColourCounts } from '../public/games/snooker-rules.js';
+import { toPlayer } from './players.js';
 
 export { arrange, BLACK, COLOURS, NOMINATE_TAP };
 
 export const RED_COUNT = 15;
 export const RED_VALUE = 1;
 export const MIN_FOUL = 4;
+export const BEGINNER_FOUL = 1;
 export const NOMINATE_ANY = 'Any colour counts';
 export const NOMINATE_CHOICES = [NOMINATE_TAP, NOMINATE_ANY];
 
@@ -29,7 +31,7 @@ function openingTarget(game) {
 export function newGame(names, { nominate = NOMINATE_TAP } = {}) {
   const game = {
     type: 'snooker',
-    players: names.map((name, i) => ({ name, side: sideOf(i, names.length) })),
+    players: names.map(toPlayer).map((player, i) => ({ ...player, side: sideOf(i, names.length) })),
     current: 0,
     turnOrder: turnOrderFor(names.length),
     turnStep: 0,
@@ -54,12 +56,13 @@ function isOnTarget(game, ball) {
   if (ball === null) return false;
   if (target.kind === 'red') return ball >= 1 && ball <= RED_COUNT && !game.reds.includes(ball);
   if (target.kind === 'clearance') return ball === target.colour;
-  if (game.nominateMode === NOMINATE_ANY) return colourOf(ball) !== null;
+  if (anyColourCounts(game)) return colourOf(ball) !== null;
   return ball === target.nominated;
 }
 
 // A foul costs the value of the ball on or the ball hit, whichever is higher, and at least 4.
 function foulValue(game, ball) {
+  if (game.players[game.current].beginner) return BEGINNER_FOUL;
   const { target } = game;
   const onValue = colourOf(target.kind === 'clearance' ? target.colour : target.nominated)?.value ?? 0;
   return Math.max(MIN_FOUL, onValue, colourOf(ball)?.value ?? 0);
@@ -120,7 +123,7 @@ export function throwDart(game, dart) {
 }
 
 export function nominate(game, number) {
-  if (game.phase !== 'throwing' || game.target.kind !== 'colour' || game.nominateMode !== NOMINATE_TAP) return game;
+  if (game.phase !== 'throwing' || game.target.kind !== 'colour' || anyColourCounts(game)) return game;
   if (!colourOf(number)) return game;
   return { ...game, target: { kind: 'colour', nominated: number } };
 }

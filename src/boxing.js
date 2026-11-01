@@ -1,6 +1,8 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { shuffled } from './shuffle.js';
+import { toPlayer } from './players.js';
 
+export const BEGINNER_LIVES_SCALE = 1.5;
 export const TARGET_CHOICES = [2, 3];
 export const DEFAULT_TARGETS = 3;
 export const DIFFICULTY = {
@@ -18,12 +20,15 @@ export function newGame(names, { targets = DEFAULT_TARGETS, difficulty = DEFAULT
   const deck = shuffled(NUMBERS);
   return {
     type: 'boxing',
-    players: names.map((name, i) => ({
-      name,
-      lives,
-      targets: deck.slice(i * targets, (i + 1) * targets).sort((a, b) => a - b),
-    })),
-    maxLives: lives,
+    players: names.map(toPlayer).map((player, i) => {
+      const maxLives = player.beginner ? Math.round(lives * BEGINNER_LIVES_SCALE) : lives;
+      return {
+        ...player,
+        lives: maxLives,
+        maxLives,
+        targets: deck.slice(i * targets, (i + 1) * targets).sort((a, b) => a - b),
+      };
+    }),
     damageScale,
     current: 0,
     darts: [],
@@ -42,7 +47,7 @@ function resolve(game, dart) {
   if (game.players[owner].lives === 0) return { result: 'out', owner, change: 0 };
 
   if (owner === game.current) {
-    const change = Math.min(power, game.maxLives - game.players[owner].lives);
+    const change = Math.min(power, game.players[owner].maxLives - game.players[owner].lives);
     return { result: change ? 'heal' : 'full', owner, change };
   }
   const change = -Math.min(power * game.damageScale, game.players[owner].lives);

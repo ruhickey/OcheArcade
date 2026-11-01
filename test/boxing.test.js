@@ -146,3 +146,23 @@ test('the last two fight it out and the final knockout wins', () => {
   game = throwDart(game, makeDart('SingleOuter', 5));
   assert.equal(game.winnerText, 'A wins by knockout!');
 });
+
+const players = [{ name: 'A', beginner: true }, { name: 'B', beginner: false }];
+
+test('a beginner gets 1.5 times the lives, rounded, and anyone else the usual number', () => {
+  for (const [difficulty, expected] of [['Easy', 15], ['Normal', 23], ['Hard', 30]]) {
+    const game = newGame(players, { difficulty });
+    assert.equal(game.players[0].lives, expected);
+    assert.equal(game.players[0].maxLives, expected);
+    assert.equal(game.players[1].lives, DIFFICULTY[difficulty].lives);
+    assert.equal(game.players[1].maxLives, DIFFICULTY[difficulty].lives);
+  }
+});
+
+test('a beginner heals up to their own higher maximum', () => {
+  const start = fight('Normal', players);
+  const hurt = { ...start, players: start.players.map((p, i) => (i === 0 ? { ...p, lives: 22 } : p)) };
+  const healed = throwDart(hurt, makeDart('Triple', 1));
+  assert.equal(healed.players[0].lives, 23);
+  assert.equal(healed.last.change, 1);
+});

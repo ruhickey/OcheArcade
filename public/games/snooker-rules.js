@@ -11,3 +11,8 @@ export const COLOURS = [
   { number: BLACK, name: 'Black', value: 7 },
 ];
 export const NOMINATE_TAP = 'Tap on the iPad';
+
+// Beginners never have to nominate.
+export function anyColourCounts(game) {
+  return game.nominateMode !== NOMINATE_TAP || game.players[game.current].beginner;
+}

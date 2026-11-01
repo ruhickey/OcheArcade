@@ -243,3 +243,35 @@ test('real throws work, and bouncers count as a foul', () => {
   const bouncer = dartFromThrow({ bed: 'Triple', multiplier: 3, segmentName: 'T9', segmentNumber: 9, bouncer: true });
   assert.equal(throwDart(newGame(['A', 'B']), bouncer).last.foul, true);
 });
+
+const beginnerFirst = () => newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+
+test('any colour counts for a beginner after a red, with no nomination', () => {
+  const afterRed = throwDart(beginnerFirst(), red(1));
+  assert.equal(nominate(afterRed, 16), afterRed);
+  const game = throwDart(afterRed, colour(20));
+  assert.equal(game.last.foul, false);
+  assert.equal(left(game), 7);
+});
+
+test('a player who isn’t a beginner must still nominate', () => {
+  const afterRed = throwDart({ ...beginnerFirst(), current: 1 }, red(1));
+  assert.equal(nominate(afterRed, 16).target.nominated, 16);
+  const game = throwDart(afterRed, colour(20));
+  assert.equal(game.last.foul, true);
+});
+
+test('a beginner’s foul gives away 1 point, and anyone else’s the usual amount', () => {
+  const foul = throwDart(beginnerFirst(), makeDart('Miss'));
+  assert.equal(foul.last.penalty, 1);
+  assert.equal(right(foul), 1);
+  const other = throwDart({ ...beginnerFirst(), current: 1 }, makeDart('Miss'));
+  assert.equal(other.last.penalty, 4);
+});
+
+test('a beginner’s foul on the re-spotted black still loses the frame', () => {
+  const game = { ...beginnerFirst(), respottedBlack: true, target: { kind: 'clearance', colour: BLACK } };
+  const lost = throwDart(game, makeDart('Miss'));
+  assert.equal(lost.phase, 'over');
+  assert.equal(lost.winner, 'right');
+});

@@ -15,6 +15,7 @@ const TROPHY_SIZE = 74;
 let boardEl = null;
 let tokens = [];
 let displayedPos = [];
+let manualMiss = null;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -128,6 +129,7 @@ export default {
     displayedPos = game.players.map((player) => player.pos);
     placeAllTokens();
     tokens.forEach((token, i) => token.classList.toggle('active', i === game.current));
+    manualMiss.textContent = game.players[game.current].beginner ? 1 : 0;
   },
 
   async animate(game, isCurrent) {
@@ -177,6 +179,7 @@ export default {
       label.textContent = bed.label;
       const spaces = document.createElement('b');
       spaces.textContent = bed.spaces;
+      if (bed.spaces === 0) manualMiss = spaces;
       button.append(label, spaces);
       button.addEventListener('click', () => sendDart({ bed: bed.id }));
       container.appendChild(button);

@@ -146,8 +146,8 @@ export default {
     game.players.forEach((player, i) => {
       const { card, lives, fill, stamp } = els.cards[i];
       lives.textContent = player.lives;
-      fill.style.width = `${(player.lives / game.maxLives) * 100}%`;
-      fill.classList.toggle('box-bar-low', player.lives / game.maxLives <= 0.25);
+      fill.style.width = `${(player.lives / player.maxLives) * 100}%`;
+      fill.classList.toggle('box-bar-low', player.lives / player.maxLives <= 0.25);
       card.classList.toggle('box-current', i === game.current && game.phase !== 'over');
       card.classList.toggle('box-out', player.lives === 0);
       stamp.hidden = player.lives !== 0;

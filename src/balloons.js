@@ -1,7 +1,9 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { advance, isFinalTurn } from './rounds.js';
 import { TURN_MS, elapsedMs, freshClock, isExpired, isFromEarlierTurn, startedClock } from '../public/games/turn-clock.js';
+import { toPlayer } from './players.js';
 
+export const BEGINNER_BUBBLE_SCALE = 1.4;
 export const ROUND_CHOICES = [3, 5, 10];
 export const DEFAULT_ROUNDS = 5;
 export const CLOCK_CHOICES = ['20 seconds', 'No clock'];
@@ -29,9 +31,10 @@ function randomSpot(r) {
 }
 
 // Bubbles stay put for the whole turn, so they're placed clear of each other. Largest go first.
-function placeBubbles() {
+function placeBubbles(scale) {
   const placed = [];
-  for (const { value, r } of BUBBLES) {
+  for (const { value, r: baseR } of BUBBLES) {
+    const r = baseR * scale;
     let spot = randomSpot(r);
     for (let tries = 0; tries < PLACEMENT_TRIES; tries++) {
       const clear = placed.every((other) => Math.hypot(spot.x - other.x, spot.y - other.y) >= r + other.r + BUBBLE_GAP);
@@ -44,7 +47,8 @@ function placeBubbles() {
 }
 
 function startTurn(game) {
-  return { ...game, darts: [], phase: 'throwing', last: null, bubbles: placeBubbles(), clock: game.timed ? freshClock(Date.now()) : null };
+  const scale = game.players[game.current].beginner ? BEGINNER_BUBBLE_SCALE : 1;
+  return { ...game, darts: [], phase: 'throwing', last: null, bubbles: placeBubbles(scale), clock: game.timed ? freshClock(Date.now()) : null };
 }
 
 function winnerText(winner, game) {
@@ -57,7 +61,7 @@ const rules = { score: (player) => player.points, winnerText, startTurn };
 export function newGame(names, { rounds = DEFAULT_ROUNDS, clock = CLOCK_CHOICES[0] } = {}) {
   return startTurn({
     type: 'balloons',
-    players: names.map((name) => ({ name, points: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, points: 0 })),
     current: 0,
     round: 1,
     rounds,

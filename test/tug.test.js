@@ -105,3 +105,24 @@ test('bull rankings put the closest of three alone', () => {
   assert.deepEqual(game.players.map((p) => p.side), ['left', 'right', 'right']);
   assert.equal(game.players[0].name, 'First');
 });
+
+const beginnerFirst = () => newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+
+test('a beginner’s points count 1.5 times, rounded, across the rope, pips and totals', () => {
+  const game = throwDart(beginnerFirst(), makeDart('SingleOuter', 20));
+  assert.equal(game.rope, -30);
+  assert.equal(game.players[0].points, 30);
+  assert.equal(game.darts[0].points, 30);
+  assert.equal(game.last.points, 30);
+  assert.equal(throwDart(beginnerFirst(), makeDart('SingleOuter', 5)).last.points, 8);
+});
+
+test('anyone else’s points count as usual', () => {
+  const game = throwDart({ ...beginnerFirst(), current: 1 }, makeDart('SingleOuter', 20));
+  assert.equal(game.rope, 20);
+  assert.equal(game.players[1].points, 20);
+});
+
+test('a beginner’s miss still pulls nothing', () => {
+  assert.equal(throwDart(beginnerFirst(), makeDart('Miss')).rope, 0);
+});

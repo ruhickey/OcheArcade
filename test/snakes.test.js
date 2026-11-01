@@ -131,3 +131,18 @@ test('real throws measure distance from the bull using the feed coordinates', ()
   assert.equal(dartFromThrow({ bed: 'Triple', multiplier: 3, segmentNumber: 1, coordsX: 0.3, coordsY: 0.4, bouncer: true }).distance, null);
   assert.equal(dartFromThrow({ bed: 'SingleInner', multiplier: 1, segmentNumber: 1 }).distance, null);
 });
+
+test('a miss moves a beginner 1 space, but not anyone else', () => {
+  const players = [{ name: 'A', beginner: true }, { name: 'B', beginner: false }];
+  const game = throwDart(newGame(players), bedById('Miss'));
+  assert.equal(game.players[0].pos, 1);
+  assert.equal(game.last.spaces, 1);
+  const other = throwDart({ ...newGame(players), current: 1 }, bedById('Miss'));
+  assert.equal(other.players[1].pos, 0);
+  assert.deepEqual(other.last.path, []);
+});
+
+test('a beginner’s hits move as usual', () => {
+  const game = throwDart(newGame([{ name: 'A', beginner: true }]), bedById('SingleOuter'));
+  assert.equal(game.players[0].pos, 4);
+});

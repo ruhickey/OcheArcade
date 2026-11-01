@@ -1,7 +1,9 @@
+import { toPlayer } from './players.js';
+
 // Throw for the bull: one dart each, closest goes first. Exact ties rethrow.
 export function newBullOff(names) {
   return {
-    entrants: names.map((name) => ({ name, throws: [] })),
+    entrants: names.map(toPlayer).map((player) => ({ ...player, throws: [] })),
     queue: names.map((_, i) => i),
     position: 0,
     round: 1,
@@ -54,6 +56,6 @@ export function advance(bullOff) {
   return { ...bullOff, phase: 'done', ranking, last: null };
 }
 
-export function rankedNames(bullOff) {
-  return bullOff.ranking.map((i) => bullOff.entrants[i].name);
+export function rankedPlayers(bullOff) {
+  return bullOff.ranking.map((i) => toPlayer(bullOff.entrants[i]));
 }

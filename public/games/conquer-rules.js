@@ -12,8 +12,9 @@ export function neighbours(number) {
 const ownedBy = (regions, player) => Object.keys(regions).map(Number).filter((n) => regions[n].owner === player);
 
 // The bull is always in play. Holding it lifts the adjacency rule, and so does having nothing left.
-export function canReach(regions, player, number) {
-  if (number === BULL) return true;
+// `free` lifts it too, for a beginner.
+export function canReach(regions, player, number, free = false) {
+  if (free || number === BULL) return true;
   const owned = ownedBy(regions, player);
   if (owned.length === 0 || owned.includes(BULL) || owned.includes(number)) return true;
   return neighbours(number).some((neighbour) => owned.includes(neighbour));

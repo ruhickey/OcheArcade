@@ -1,6 +1,7 @@
 import { DARTS_PER_TURN } from './turns.js';
 import { advance, isFinalTurn } from './rounds.js';
 import { BOARD_ORDER, BULL, canReach } from '../public/games/conquer-rules.js';
+import { toPlayer } from './players.js';
 
 export const ROUND_CHOICES = [5, 10, 15, 20];
 export const DEFAULT_ROUNDS = 10;
@@ -39,7 +40,7 @@ export function newGame(names, { rounds = DEFAULT_ROUNDS } = {}) {
   const regions = Object.fromEntries(homes.map((home, owner) => [home, { owner, shields: STARTING_SHIELDS }]));
   return startTurn({
     type: 'conquer',
-    players: withScores(names.map((name, i) => ({ name, home: homes[i], score: 0 })), regions),
+    players: withScores(names.map(toPlayer).map((player, i) => ({ ...player, home: homes[i], score: 0 })), regions),
     regions,
     current: 0,
     round: 1,
@@ -59,7 +60,7 @@ function regionHit(dart) {
 // Works out what a dart does. Doubles and trebles count as 2 and 3 for shields only.
 function resolve(game, number, power) {
   if (number === null) return { result: 'miss' };
-  if (!canReach(game.regions, game.current, number)) return { result: 'blocked' };
+  if (!canReach(game.regions, game.current, number, game.players[game.current].beginner)) return { result: 'blocked' };
 
   const region = game.regions[number];
   if (!region) return { result: 'claim', region: { owner: game.current, shields: STARTING_SHIELDS } };

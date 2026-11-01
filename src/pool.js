@@ -1,6 +1,7 @@
 import { DARTS_PER_TURN, nextPlayer } from './turns.js';
 import { arrange, sideNames, sideOf, turnOrderFor } from './teams.js';
 import { shuffled } from './shuffle.js';
+import { toPlayer } from './players.js';
 
 export { arrange };
 
@@ -28,7 +29,7 @@ export function newGame(names, { mode = DEFAULT_MODE } = {}) {
   const { tough } = MODES[mode];
   return {
     type: 'pool',
-    players: names.map((name, i) => ({ name, side: sideOf(i, names.length), thrown: 0 })),
+    players: names.map(toPlayer).map((player, i) => ({ ...player, side: sideOf(i, names.length), thrown: 0 })),
     current: 0,
     turnOrder: turnOrderFor(names.length),
     turnStep: 0,
@@ -48,12 +49,15 @@ export function newGame(names, { mode = DEFAULT_MODE } = {}) {
   };
 }
 
+// Beginners can pot a tough ball with any part of its number.
+const needsToughBed = (game, ball) => ball.tough && !game.players[game.current].beginner;
+
 function isOnTarget(game, side, dart) {
   const { balls, potted } = game.sides[side];
   if (game.shootout || potted === BALLS) return BULL_BEDS.includes(dart.id);
   const ball = balls[potted];
   if (dart.number !== ball.number) return false;
-  return (ball.tough ? TOUGH_BEDS : NUMBER_BEDS).includes(dart.id);
+  return (needsToughBed(game, ball) ? TOUGH_BEDS : NUMBER_BEDS).includes(dart.id);
 }
 
 // A single on a double-or-triple ball pots nothing, but doesn't cost the rest of the turn.
@@ -61,7 +65,7 @@ function isNearMiss(game, side, dart) {
   const { balls, potted } = game.sides[side];
   if (game.shootout || potted === BALLS) return false;
   const ball = balls[potted];
-  return ball.tough && dart.number === ball.number && SINGLE_BEDS.includes(dart.id);
+  return needsToughBed(game, ball) && dart.number === ball.number && SINGLE_BEDS.includes(dart.id);
 }
 
 const other = (side) => (side === 'left' ? 'right' : 'left');
@@ -105,16 +109,18 @@ function shootoutDart(game, side, hit) {
 export function throwDart(game, dart) {
   if (game.phase !== 'throwing') return game;
 
-  const { side } = game.players[game.current];
+  const { side, beginner } = game.players[game.current];
   const hit = isOnTarget(game, side, dart);
   const near = isNearMiss(game, side, dart);
   const darts = [...game.darts, { name: dart.name, hit }];
+  // A beginner's miss doesn't cost the rest of the turn.
+  const spared = beginner && !hit && !game.shootout && darts.length < DARTS_PER_TURN;
   const moved = {
     ...game,
     players: game.players.map((p, i) => (i === game.current && !game.shootout ? { ...p, thrown: p.thrown + 1 } : p)),
     darts,
     seq: game.seq + 1,
-    last: { player: game.current, name: dart.name, hit, near, eightBall: false, shootout: Boolean(game.shootout) },
+    last: { player: game.current, name: dart.name, hit, near, spared, eightBall: false, shootout: Boolean(game.shootout) },
   };
 
   if (game.shootout) return shootoutDart(moved, side, hit);
@@ -124,7 +130,7 @@ export function throwDart(game, dart) {
 
   if (!hit) {
     const counted = { ...moved, sides: { ...game.sides, [side]: { ...state, thrown } } };
-    const turnGoesOn = near && darts.length < DARTS_PER_TURN;
+    const turnGoesOn = spared || (near && darts.length < DARTS_PER_TURN);
     if (turnGoesOn && !(game.lastChance && thrown >= game.sides[other(side)].thrown)) return counted;
     if (game.lastChance) return win(counted, other(side), dartsText(counted, other(side)));
     return { ...counted, turnOver: true, phase: 'takeout' };

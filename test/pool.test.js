@@ -284,3 +284,51 @@ test('teammates carry on from the same ball, and team wins name both', () => {
   finish = throwDart(finish, miss);
   assert.equal(finish.winnerText, 'A & C win in 10 darts!');
 });
+
+function beginnerGame(tough = false) {
+  const game = newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+  const balls = Array.from({ length: BALLS }, (_, i) => ({ number: i + 1, tough }));
+  const sides = {
+    left: { ...game.sides.left, balls },
+    right: { ...game.sides.right, balls },
+  };
+  return { ...game, sides };
+}
+
+test('a miss doesn’t end a beginner’s turn, but every dart counts', () => {
+  const game = throwDart(beginnerGame(), makeDart('Miss'));
+  assert.equal(game.phase, 'throwing');
+  assert.equal(game.last.spared, true);
+  assert.equal(game.sides.left.thrown, 1);
+  assert.equal(game.turnOver, false);
+});
+
+test('a beginner’s third miss hands over', () => {
+  const miss = makeDart('Miss');
+  const game = [miss, miss, miss].reduce(throwDart, beginnerGame());
+  assert.equal(game.phase, 'takeout');
+  assert.equal(game.turnOver, true);
+  assert.equal(game.last.spared, false);
+  assert.equal(endTurn(game).current, 1);
+});
+
+test('a miss still ends anyone else’s turn', () => {
+  const game = throwDart({ ...beginnerGame(), current: 1 }, makeDart('Miss'));
+  assert.equal(game.phase, 'takeout');
+  assert.equal(game.turnOver, true);
+});
+
+test('any bed pots a tough ball for a beginner, but not for anyone else', () => {
+  const potted = throwDart(beginnerGame(true), single(1));
+  assert.equal(potted.sides.left.potted, 1);
+  const other = throwDart({ ...beginnerGame(true), current: 1 }, single(1));
+  assert.equal(other.sides.right.potted, 0);
+  assert.equal(other.last.near, true);
+});
+
+test('a beginner’s miss in a shootout isn’t spared', () => {
+  const game = { ...beginnerGame(), shootout: { left: null, right: null, round: 1 } };
+  const after = throwDart(game, makeDart('Miss'));
+  assert.equal(after.last.spared, false);
+  assert.equal(after.phase, 'takeout');
+});

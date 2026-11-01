@@ -1,6 +1,9 @@
 import { DARTS_PER_TURN } from './turns.js';
+import { toPlayer } from './players.js';
 
 export const FINISH = 100;
+// A beginner's miss still moves them this far.
+export const BEGINNER_MIN_SPACES = 1;
 
 export const LADDERS = { 3: 22, 8: 30, 28: 55, 41: 63, 58: 77, 71: 92 };
 export const SNAKES = { 17: 6, 36: 14, 49: 29, 65: 44, 68: 48, 88: 66, 95: 75, 99: 80 };
@@ -8,7 +11,7 @@ export const SNAKES = { 17: 6, 36: 14, 49: 29, 65: 44, 68: 48, 88: 66, 95: 75, 9
 export function newGame(names) {
   return {
     type: 'snakes',
-    players: names.map((name) => ({ name, pos: 0 })),
+    players: names.map(toPlayer).map((player) => ({ ...player, pos: 0 })),
     current: 0,
     darts: [],
     phase: 'throwing', // throwing | takeout | over
@@ -36,13 +39,14 @@ export function throwDart(game, bed) {
   if (game.phase !== 'throwing') return game;
 
   const player = game.players[game.current];
-  const { path, bounced } = walk(player.pos, bed.spaces);
+  const spaces = player.beginner ? Math.max(bed.spaces, BEGINNER_MIN_SPACES) : bed.spaces;
+  const { path, bounced } = walk(player.pos, spaces);
   const landed = path.at(-1) ?? player.pos;
   const moved = path.length > 0;
   const slide = moved ? (LADDERS[landed] ?? SNAKES[landed] ?? null) : null;
   const pos = slide ?? landed;
   const won = pos === FINISH;
-  const darts = [...game.darts, { label: bed.label, spaces: bed.spaces }];
+  const darts = [...game.darts, { label: bed.label, spaces }];
 
   return {
     ...game,
@@ -55,7 +59,7 @@ export function throwDart(game, bed) {
     last: {
       player: game.current,
       label: bed.label,
-      spaces: bed.spaces,
+      spaces,
       from: player.pos,
       path,
       bounced,

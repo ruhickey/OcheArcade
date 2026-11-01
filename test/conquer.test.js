@@ -205,3 +205,27 @@ test('with more players it’s every player for themselves', () => {
   assert.equal(game.regions[1].owner, 0);
   assert.equal(game.regions[5].owner, 0);
 });
+
+// A's home is 20, and B's is 3, so 11 is next to neither.
+function beginnerFirst() {
+  const game = newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+  return { ...game, regions: { 20: { owner: 0, shields: 1 }, 3: { owner: 1, shields: 1 } } };
+}
+
+test('a beginner can claim a number with no adjacent region', () => {
+  const game = throwDart(beginnerFirst(), single(11));
+  assert.equal(game.last.result, 'claim');
+  assert.equal(game.regions[11].owner, 0);
+});
+
+test('anyone else is still blocked', () => {
+  const game = throwDart({ ...beginnerFirst(), current: 1 }, single(11));
+  assert.equal(game.last.result, 'blocked');
+  assert.equal(game.regions[11], undefined);
+});
+
+test('canReach lifts the adjacency rule only when free', () => {
+  const regions = { 20: { owner: 0, shields: 1 } };
+  assert.equal(canReach(regions, 0, 11), false);
+  assert.equal(canReach(regions, 0, 11, true), true);
+});

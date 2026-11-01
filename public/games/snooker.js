@@ -1,5 +1,5 @@
 import { buildPad } from './pad.js';
-import { BLACK, COLOURS, NOMINATE_TAP } from './snooker-rules.js';
+import { BLACK, COLOURS, anyColourCounts } from './snooker-rules.js';
 
 const MOVE_MS = 350;
 const RED_ROWS = [[1], [2, 3], [4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14, 15]];
@@ -21,7 +21,7 @@ function prompt(game) {
   if (game.respottedBlack) return 'Re-spotted black: next score wins, and a foul loses!';
   if (target.kind === 'red') return 'Hit a red: any number left from 1 to 15';
   if (target.kind === 'clearance') return `Hit ${colourName(target.colour)}: ${throwLabel(target.colour)}`;
-  if (game.nominateMode !== NOMINATE_TAP) return 'Hit any colour: 16 to Bull';
+  if (anyColourCounts(game)) return 'Hit any colour: 16 to Bull';
   if (target.nominated === null) return 'Tap a colour to nominate it';
   return `Hit ${colourName(target.nominated)}: ${throwLabel(target.nominated)}`;
 }
@@ -31,7 +31,7 @@ function highlighted(game, colour) {
   if (game.phase !== 'throwing') return false;
   if (target.kind === 'clearance') return target.colour === colour.number;
   if (target.kind !== 'colour') return false;
-  return game.nominateMode === NOMINATE_TAP ? target.nominated === colour.number : true;
+  return anyColourCounts(game) ? true : target.nominated === colour.number;
 }
 
 function renderReds(game) {
@@ -51,7 +51,7 @@ function renderReds(game) {
 }
 
 function renderColours(game) {
-  const canTap = game.phase === 'throwing' && game.target.kind === 'colour' && game.nominateMode === NOMINATE_TAP;
+  const canTap = game.phase === 'throwing' && game.target.kind === 'colour' && !anyColourCounts(game);
   els.colours.replaceChildren(...COLOURS.map((colour) => {
     const ball = document.createElement('button');
     ball.type = 'button';

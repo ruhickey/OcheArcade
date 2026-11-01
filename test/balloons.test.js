@@ -271,3 +271,20 @@ test('with no clock, no dart is treated as coming from an earlier turn', (t) => 
   const { x, y } = after.bubbles[0];
   assert.ok(throwDart(after, dartAt(x, y, clock.now - 700)).players[1].points > 0);
 });
+
+test('bubbles are bigger on a beginner’s turn, and only theirs', () => {
+  const game = newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }], { clock: 'No clock' });
+  assert.deepEqual(game.bubbles.map((b) => b.value), [10, 20, 30, 50, 100]);
+  assert.ok(Math.abs(game.bubbles[0].r - 0.28) < 1e-9);
+  let next = throwDart(game, missDart());
+  next = endTurn(next);
+  assert.equal(next.current, 1);
+  assert.equal(next.bubbles[0].r, 0.2);
+});
+
+test('a beginner’s bigger bubbles all stay on the board', () => {
+  for (let run = 0; run < 200; run++) {
+    const { bubbles } = newGame([{ name: 'A', beginner: true }]);
+    for (const b of bubbles) assert.ok(Math.hypot(b.x, b.y) + b.r <= 1 + 1e-9);
+  }
+});

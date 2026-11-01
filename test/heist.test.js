@@ -163,3 +163,37 @@ test('one player just gets a final score', () => {
   const game = endTurn(throwDart(withCode(newGame(['Solo'], { rounds: 1 }), 20), single(20)));
   assert.equal(game.winnerText, 'Solo finishes with 20 points!');
 });
+
+const beginnerGame = (code) => withCode(newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]), code);
+
+test('a beginner cracks the code within 5 of zero, either side', () => {
+  for (const hit of [15, 20]) {
+    const game = throwDart(beginnerGame(20), single(hit));
+    assert.equal(game.last.result, 'looted');
+    assert.equal(game.remaining, 0);
+    assert.equal(game.players[0].points, 20);
+  }
+  const under = throwDart(beginnerGame(16), single(20));
+  assert.equal(under.last.result, 'looted');
+  assert.equal(under.remaining, 0);
+  assert.equal(under.players[0].points, 16);
+});
+
+test('a beginner still busts more than 5 under zero', () => {
+  const game = throwDart(beginnerGame(10), single(16));
+  assert.equal(game.last.result, 'bust');
+  assert.equal(game.players[0].points, 0);
+});
+
+test('a beginner’s turn carries on more than 5 from zero', () => {
+  const game = throwDart(beginnerGame(30), single(10));
+  assert.equal(game.last.result, null);
+  assert.equal(game.remaining, 20);
+});
+
+test('anyone else still has to hit exactly zero', () => {
+  const game = throwDart({ ...beginnerGame(20), current: 1 }, single(17));
+  assert.equal(game.last.result, null);
+  assert.equal(game.remaining, 3);
+  assert.equal(throwDart({ ...beginnerGame(20), current: 1 }, makeDart('Triple', 7)).last.result, 'bust');
+});

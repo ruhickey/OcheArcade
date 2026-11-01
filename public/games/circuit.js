@@ -14,10 +14,10 @@ let zones = {};
 let current = null;
 let frame = null;
 
-function zoneMatches(target, zone) {
+function zoneMatches(target, zone, anyBed) {
   if (zone === 'InnerBull' || zone === 'OuterBull') return false;
   const [bed, number] = zone.split('-');
-  return matches(target, bed, Number(number));
+  return matches(target, bed, Number(number), anyBed);
 }
 
 function renderClock(game, now) {
@@ -47,7 +47,7 @@ function renderWires(game) {
     line.className = 'cb-line';
     const label = document.createElement('div');
     label.className = 'cb-wire-label';
-    label.textContent = cut ? 'Cut' : targetText(game.wires[index]);
+    label.textContent = cut ? 'Cut' : targetText(game.wires[index], game.players[game.current].beginner);
     wire.append(line, label);
     return wire;
   }));
@@ -112,8 +112,9 @@ export default {
     current = game;
     const target = game.wires[Math.min(game.wire, game.wires.length - 1)];
     const live = game.phase === 'throwing';
+    const { beginner } = game.players[game.current];
     for (const [zone, el] of Object.entries(zones)) {
-      const on = live && zoneMatches(target, zone);
+      const on = live && zoneMatches(target, zone, beginner);
       el.classList.toggle('cb-on', on);
       el.classList.toggle('cb-off', live && !on);
     }
@@ -122,7 +123,7 @@ export default {
     els.liveBomb.hidden = game.phase === 'over';
     if (game.phase === 'over') els.target.textContent = game.winner ? 'Defused!' : 'Boom!';
     else if (game.phase === 'takeout') els.target.textContent = 'Turn over';
-    else els.target.textContent = targetText(target);
+    else els.target.textContent = targetText(target, beginner);
     renderLives(game);
     renderWires(game);
     renderClock(game, serverNow());
@@ -131,6 +132,7 @@ export default {
   async animate(game) {
     this.sync(game);
     const { last } = game;
+    if (last.spared) return;
     // A cut snips the wire just cut, and anything else blows up on the board.
     const effect = last.hit
       ? sprite('circuit/cutters', 'cb-snip')
@@ -150,10 +152,14 @@ export default {
     if (last.tooLate) return 'Too late! That cost a life.';
     if (last.defusedBomb) return `${last.name}: bomb defused!`;
     if (last.hit) return `${last.name}: wire cut!`;
+    if (last.spared) return `${last.name}: wrong wire, but no harm done.`;
     return `${last.name}: wrong wire! That cost a life.`;
   },
 
-  pip: (dart) => (dart.hit ? `${dart.name} cut` : `${dart.name} boom`),
+  pip: (dart) => {
+    if (dart.hit) return `${dart.name} cut`;
+    return dart.spared ? `${dart.name} safe` : `${dart.name} boom`;
+  },
   score: (player) => player.cuts,
   swatch: (_player, index) => index,
 

@@ -28,7 +28,7 @@ let state = null;
 let soundPhase = null;
 let lockedAtPress = false;
 let activeModule = null;
-let roster = loadNames();
+let roster = loadRoster();
 let view = roster ? 'menu' : 'players'; // players | menu | setup
 let chosenGame = null;
 let chosenOptions = {};
@@ -103,7 +103,9 @@ function renderPanel(game, canUndo) {
     const score = document.createElement('span');
     score.className = 'score-pos';
     score.textContent = module.score(p);
-    row.append(swatch, name, score);
+    row.append(swatch, name);
+    if (p.beginner) row.append(beginnerTag());
+    row.append(score);
     return row;
   }));
 
@@ -196,15 +198,27 @@ document.addEventListener('click', async (event) => {
   if (state) renderFeed(state.board);
 });
 
-function renderMenu() {
-  const names = roster ?? [];
-  $('roster').replaceChildren(...names.map((name, i) => {
+function beginnerTag() {
+  const tag = document.createElement('span');
+  tag.className = 'beginner-tag';
+  tag.textContent = 'Beginner';
+  return tag;
+}
+
+function rosterItems(players) {
+  return players.map(({ name, beginner }, i) => {
     const item = document.createElement('li');
     const swatch = document.createElement('span');
     swatch.className = `swatch swatch-${i}`;
     item.append(swatch, name);
+    if (beginner) item.append(beginnerTag());
     return item;
-  }));
+  });
+}
+
+function renderMenu() {
+  const names = roster ?? [];
+  $('roster').replaceChildren(...rosterItems(names));
 
   $('game-list').replaceChildren(...Object.values(state.games).map((definition) => {
     const card = document.createElement('button');
@@ -273,13 +287,9 @@ function renderSetup() {
     return group;
   }));
 
-  $('setup-roster').replaceChildren(...roster.map((name, i) => {
-    const item = document.createElement('li');
-    const swatch = document.createElement('span');
-    swatch.className = `swatch swatch-${i}`;
-    item.append(swatch, name);
-    return item;
-  }));
+  $('setup-roster').replaceChildren(...rosterItems(roster));
+  $('setup-beginner').hidden = !definition.beginner || !roster.some((player) => player.beginner);
+  $('setup-beginner').textContent = definition.beginner ?? '';
 
   // There is nothing to decide with one player.
   const solo = roster.length === 1;
@@ -361,25 +371,30 @@ function render() {
 
 /* Players */
 
-function resolveNames(names) {
-  return names.map((name, i) => name || `Player ${i + 1}`);
+function resolveNames(players) {
+  return players.map(({ name, beginner }, i) => ({ name: name || `Player ${i + 1}`, beginner }));
 }
 
-function loadNames() {
+// Players saved before the beginner setting are just names.
+function savedPlayer(entry) {
+  return typeof entry === 'string' ? { name: entry, beginner: false } : { name: entry?.name, beginner: entry?.beginner === true };
+}
+
+function loadRoster() {
   try {
-    const names = JSON.parse(localStorage.getItem(NAMES_KEY) ?? localStorage.getItem(OLD_NAMES_KEY));
-    if (Array.isArray(names) && names.length) return resolveNames(names.slice(0, MAX_PLAYERS));
+    const players = JSON.parse(localStorage.getItem(NAMES_KEY) ?? localStorage.getItem(OLD_NAMES_KEY));
+    if (Array.isArray(players) && players.length) return resolveNames(players.slice(0, MAX_PLAYERS).map(savedPlayer));
   } catch {}
   return null;
 }
 
-function saveNames(names) {
+function saveRoster(players) {
   try {
-    localStorage.setItem(NAMES_KEY, JSON.stringify(names));
+    localStorage.setItem(NAMES_KEY, JSON.stringify(players));
   } catch {}
 }
 
-function addNameField(value = '') {
+function addNameField({ name = '', beginner = false } = {}) {
   const fields = $('name-fields');
   const index = fields.childElementCount;
   const row = document.createElement('div');
@@ -388,12 +403,21 @@ function addNameField(value = '') {
   swatch.className = `swatch swatch-${index}`;
   const input = document.createElement('input');
   input.type = 'text';
-  input.value = value;
+  input.value = name;
   input.placeholder = `Player ${index + 1}`;
   input.maxLength = 16;
   input.autocomplete = 'off';
   input.setAttribute('aria-label', `Player ${index + 1} name`);
-  row.append(swatch, input);
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.textContent = 'Beginner';
+  const setBeginner = (on) => {
+    toggle.className = on ? 'btn on beginner-toggle' : 'btn beginner-toggle';
+    toggle.setAttribute('aria-pressed', on);
+  };
+  setBeginner(beginner);
+  toggle.addEventListener('click', () => setBeginner(toggle.getAttribute('aria-pressed') !== 'true'));
+  row.append(swatch, input, toggle);
   fields.appendChild(row);
   updateFieldButtons();
 }
@@ -404,7 +428,7 @@ function updateFieldButtons() {
   $('remove-player').disabled = count <= 1;
 }
 
-(roster ?? ['', '']).forEach(addNameField);
+(roster ?? [{}, {}]).forEach((player) => addNameField(player));
 $('add-player').addEventListener('click', () => addNameField());
 $('remove-player').addEventListener('click', () => {
   $('name-fields').lastElementChild.remove();
@@ -412,8 +436,11 @@ $('remove-player').addEventListener('click', () => {
 });
 $('players-form').addEventListener('submit', (event) => {
   event.preventDefault();
-  roster = resolveNames([...$('name-fields').querySelectorAll('input')].map((input) => input.value.trim()));
-  saveNames(roster);
+  roster = resolveNames([...$('name-fields').children].map((row) => ({
+    name: row.querySelector('input').value.trim(),
+    beginner: row.querySelector('button').getAttribute('aria-pressed') === 'true',
+  })));
+  saveRoster(roster);
   chosenGame = null;
   view = 'menu';
   render();
@@ -448,7 +475,8 @@ $('quit-dialog').addEventListener('click', (event) => {
   if (event.target === $('quit-dialog')) $('quit-dialog').close();
 });
 $('rematch').addEventListener('click', () => {
-  post('/api/new', { type: state.game.type, names: state.game.players.map((p) => p.name), options: state.game.options });
+  const players = state.game.players.map(({ name, beginner }) => ({ name, beginner }));
+  post('/api/new', { type: state.game.type, players, options: state.game.options });
 });
 $('winner-undo').addEventListener('click', () => post('/api/undo'));
 $('winner-quit').addEventListener('click', () => {
@@ -461,10 +489,10 @@ $('setup-back').addEventListener('click', () => {
   render();
 });
 $('start-bull').addEventListener('click', () => {
-  post('/api/bull', { type: chosenGame, names: roster, options: chosenOptions });
+  post('/api/bull', { type: chosenGame, players: roster, options: chosenOptions });
 });
 $('start-order').addEventListener('click', () => {
-  post('/api/new', { type: chosenGame, names: roster, options: chosenOptions });
+  post('/api/new', { type: chosenGame, players: roster, options: chosenOptions });
 });
 
 $('bull-start').addEventListener('click', () => post('/api/bull/start'));

@@ -16,13 +16,15 @@ const BEDS = {
 };
 
 // `bed` is a board bed's id and `number` its 1 to 20 number. Bulls and misses never match.
-export function matches(target, bed, number) {
+// With `anyBed`, for a beginner, any part of a target's number will do.
+export function matches(target, bed, number, anyBed = false) {
   if (!(number >= 1 && number <= 20) || !Object.values(BEDS).flat().includes(bed)) return false;
   if (REGIONS[target.kind]) return REGIONS[target.kind](number);
-  return number === target.number && BEDS[target.kind].includes(bed);
+  return number === target.number && (anyBed || BEDS[target.kind].includes(bed));
 }
 
-export function targetText(target) {
+export function targetText(target, anyBed = false) {
   const names = { odd: 'Odd', even: 'Even', left: 'Left half', right: 'Right half', single: 'Single', double: 'Double', triple: 'Triple' };
-  return target.number ? `${names[target.kind]} ${target.number}` : names[target.kind];
+  if (!target.number) return names[target.kind];
+  return anyBed ? `Any ${target.number}` : `${names[target.kind]} ${target.number}`;
 }

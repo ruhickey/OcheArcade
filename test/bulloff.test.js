@@ -1,8 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { advance, newBullOff, rankedNames, throwDart } from '../src/bulloff.js';
+import { advance, newBullOff, rankedPlayers, throwDart } from '../src/bulloff.js';
 
 const play = (bullOff, distance) => advance(throwDart(bullOff, { distance }));
+const rankedNames = (bullOff) => rankedPlayers(bullOff).map((player) => player.name);
+
+test('beginners stay marked after the ranking reorders them', () => {
+  let b = newBullOff([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+  b = play(play(b, 0.5), 0.1);
+  assert.deepEqual(rankedPlayers(b), [{ name: 'B', beginner: false }, { name: 'A', beginner: true }]);
+});
 
 test('everyone throws once and the closest ranks first', () => {
   let b = newBullOff(['A', 'B', 'C']);

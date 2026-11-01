@@ -85,7 +85,7 @@ export default {
     for (const [key, parts] of Object.entries(zonesByNumber)) {
       const number = Number(key);
       const owner = game.regions[number]?.owner;
-      const dim = throwing && !canReach(game.regions, game.current, number);
+      const dim = throwing && !canReach(game.regions, game.current, number, game.players[game.current].beginner);
       for (const el of parts) {
         el.classList.remove(...OWNER_CLASSES);
         if (owner !== undefined) el.classList.add(`cq-owner-${owner}`);

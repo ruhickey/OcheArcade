@@ -96,6 +96,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 }
 .name-field input::placeholder { color: var(--chalk-dim); opacity: 0.7; }
 .name-field input:focus { outline: none; border-bottom-color: var(--sisal); }
+.beginner-toggle { flex: none; padding: 0 12px; font-size: 1.05rem; }
+.beginner-tag { flex: none; padding: 1px 6px; border: 1px solid var(--chalk-dim); border-radius: 4px; color: var(--chalk-dim); font-size: 0.85rem; font-weight: 600; }
 .setup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .setup-options { display: grid; gap: 8px; }
 .choice-row { display: flex; gap: 8px; }

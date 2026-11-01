@@ -224,3 +224,30 @@ test('a hat trick needs all three darts on the number, not just the same kind of
   assert.equal(game.last.hatTrick, false);
   assert.equal(endTurn(game).players[0].total, 1);
 });
+
+const beginnerFirst = () => newGame([{ name: 'A', beginner: true }, { name: 'B', beginner: false }]);
+
+test('a miss costs a beginner 5, but costs anyone else 7', () => {
+  const first = endTurn(throwDart(beginnerFirst(), miss));
+  assert.equal(first.players[0].total, 5);
+  const second = endTurn(throwDart(first, miss));
+  assert.equal(second.players[1].total, 7);
+});
+
+test('a beginner’s best dart still counts', () => {
+  const game = endTurn(throwAll(beginnerFirst(), miss, makeDart('Double', 1)));
+  assert.equal(game.players[0].total, 2);
+});
+
+test('three beginner misses are not a hat trick', () => {
+  const game = throwAll(beginnerFirst(), miss, miss, miss);
+  assert.equal(game.last.hatTrick, false);
+  assert.equal(game.live, 5);
+});
+
+test('a beginner still gets a real hat trick', () => {
+  const single = makeDart('SingleOuter', 1);
+  const game = throwAll(beginnerFirst(), single, single, single);
+  assert.equal(game.last.hatTrick, true);
+  assert.equal(game.live, 3);
+});

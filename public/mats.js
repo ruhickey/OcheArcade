@@ -50,6 +50,10 @@ export const MATS = {
     colour: '#4a1e6e', ink: '#ff9be3', line: 'Pot seven, then the 8-ball',
     mark: '<circle cx="24" cy="24" r="19" fill="#111"/><circle cx="24" cy="22" r="9.5" fill="#f7f4e8"/><text x="24" y="27.5" text-anchor="middle" font-family="var(--font-display)" font-size="14" fill="#111">8</text>',
   },
+  x01: {
+    colour: '#16201d', ink: '#efede3', line: 'Count down to a double finish',
+    mark: '<circle cx="24" cy="24" r="20" fill="none" stroke="#e0483c" stroke-width="3"/><text x="24" y="30" text-anchor="middle" font-family="var(--font-display)" font-size="15" fill="currentColor">501</text>',
+  },
 };
 
 export function markSvg(game) {

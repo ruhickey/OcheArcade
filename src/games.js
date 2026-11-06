@@ -10,6 +10,7 @@ import * as heist from './heist.js';
 import * as conquer from './conquer.js';
 import * as circuit from './circuit.js';
 import * as pool from './pool.js';
+import * as x01 from './x01.js';
 import { BEDS } from './segments.js';
 
 export const GAMES = {
@@ -176,5 +177,32 @@ export const GAMES = {
       default: pool.DEFAULT_MODE,
       notes: Object.fromEntries(Object.entries(pool.MODES).map(([name, { note }]) => [name, note])),
     }],
+  },
+  x01: {
+    id: 'x01',
+    name: 'X01',
+    blurb: 'Count down from 301 or 501 to exactly zero, finishing on a double or the bull. Going below zero or leaving 1 is bust, and the turn’s score comes off.',
+    minPlayers: 1,
+    newGame: x01.newGame,
+    throwDart: x01.throwDart,
+    nextPlayer: x01.endTurn,
+    options: [
+      { id: 'start', label: 'Starting score', choices: x01.START_CHOICES, default: x01.DEFAULT_START },
+      {
+        id: 'in',
+        label: 'Start',
+        choices: x01.IN_CHOICES,
+        default: x01.DEFAULT_IN,
+        notes: { 'Straight in': 'Every dart scores from the first.', 'Double in': 'Nothing scores until you hit a double or the bull.' },
+      },
+      {
+        id: 'sets',
+        label: 'Sets to win',
+        choices: x01.SET_CHOICES,
+        default: x01.DEFAULT_SETS,
+        notes: Object.fromEntries(x01.SET_CHOICES.map((n) => [n, n === 1 ? 'Legs only: the first to win the legs wins the match.' : `First to win ${n} sets wins the match.`])),
+      },
+      { id: 'legs', label: 'Legs to win a set', choices: x01.LEG_CHOICES, default: x01.DEFAULT_LEGS },
+    ],
   },
 };

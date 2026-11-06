@@ -10,13 +10,14 @@ import heist from './games/heist.js';
 import conquer from './games/conquer.js';
 import circuit from './games/circuit.js';
 import pool from './games/pool.js';
+import x01 from './games/x01.js';
 import { setServerTime } from './games/server-time.js';
 import { initSound, play, soundState, toggleMuted } from './games/sound.js';
 import { MATS, applyMatColours, markSvg } from './mats.js';
 import { renderBullOff } from './bulloff.js';
 
 const $ = (id) => document.getElementById(id);
-const MODULES = { snakes, tug, golf, paintball, balloons, snooker, boxing, fourinarow, heist, conquer, circuit, pool };
+const MODULES = { snakes, tug, golf, paintball, balloons, snooker, boxing, fourinarow, heist, conquer, circuit, pool, x01 };
 const MAX_PLAYERS = 4;
 const NAMES_KEY = 'oche-arcade-names';
 // Keeps players saved before the app was renamed.

@@ -15,6 +15,8 @@ Darts arcade games served from any machine that can reach an Autodarts Board Man
 | ![Boxing](docs/screenshots/boxing.webp)<br>**Boxing** | ![Four in a Row](docs/screenshots/fourinarow.webp)<br>**Four in a Row** | ![Heist](docs/screenshots/heist.webp)<br>**Heist** |
 | ![Conquer](docs/screenshots/conquer.webp)<br>**Conquer** | ![Circuit Breaker](docs/screenshots/circuit.webp)<br>**Circuit Breaker** | ![8 Ball Pool](docs/screenshots/pool.webp)<br>**8 Ball Pool** |
 
+There's also **X01**, for playing 301 or 501 the standard way: double out, with straight in or double in, over as many sets and legs as you choose.
+
 Each game has its own setup screen for its options and who throws first.
 
 ![The Boxing setup screen, with target numbers, difficulty and throw for the bull](docs/screenshots/setup.webp)

@@ -40,6 +40,7 @@ const STATIC_FILES = {
   '/games/server-time.js': ['games/server-time.js', 'text/javascript; charset=utf-8'],
   '/games/circuit.js': ['games/circuit.js', 'text/javascript; charset=utf-8'],
   '/games/pool.js': ['games/pool.js', 'text/javascript; charset=utf-8'],
+  '/games/x01.js': ['games/x01.js', 'text/javascript; charset=utf-8'],
   '/games/circuit-rules.js': ['games/circuit-rules.js', 'text/javascript; charset=utf-8'],
   '/games/snooker-rules.js': ['games/snooker-rules.js', 'text/javascript; charset=utf-8'],
   '/games/dartboard.js': ['games/dartboard.js', 'text/javascript; charset=utf-8'],

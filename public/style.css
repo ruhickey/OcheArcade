@@ -879,6 +879,26 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .quit-card p { margin: 0; }
 .quit-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
 
+/* X01: each player's score written large on the slate */
+.x01 { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 18px; min-height: 0; }
+.x01-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.x01-progress { color: var(--sisal); font: 1.6rem var(--font-display); }
+.x01-format { color: var(--chalk-dim); font-size: 1.12rem; font-weight: 600; }
+.x01-status { min-height: 1.3em; margin: 0; font: clamp(1.3rem, 3.6vmin, 2.2rem) var(--font-display); text-align: center; }
+.x01-status-won { color: var(--sisal); }
+.x01-status-bust { color: var(--bad); }
+.x01-players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.x01-players[data-count="1"] { grid-template-columns: minmax(0, 520px); justify-content: center; }
+.x01-player { position: relative; display: grid; justify-items: center; gap: 4px; min-width: 0; padding: 14px 12px 16px; border: 3px solid transparent; border-top: 8px solid var(--who); border-radius: 10px; background: var(--slate-lift); }
+.x01-now { border-color: var(--sisal); border-top-color: var(--who); box-shadow: 0 0 22px rgb(210 176 122 / 0.25); }
+.x01-winner { border-color: var(--sisal); border-top-color: var(--who); }
+.x01-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1.4rem; font-weight: 700; }
+.x01-remaining { color: var(--chalk); font: clamp(3rem, 13vmin, 8rem) / 1 var(--font-display); font-variant-numeric: tabular-nums; }
+.x01-players[data-count="3"] .x01-remaining, .x01-players[data-count="4"] .x01-remaining { font-size: clamp(2.6rem, 9vmin, 5.5rem); }
+.x01-bust { color: var(--bad); }
+.x01-tally { color: var(--chalk-dim); font-size: 1.1rem; font-weight: 600; }
+.x01-closed { color: var(--sisal); font-size: 1rem; font-weight: 700; }
+
 /* Portrait: the stage on top and the scoreboard underneath */
 @media (orientation: portrait) {
   :root { --board-size: min(calc(100vw - 24px), calc(100dvh - 416px)); }

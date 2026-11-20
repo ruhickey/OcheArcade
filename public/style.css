@@ -1,22 +1,25 @@
 :root {
-  --slate: #26332f;
-  --slate-lift: #2f3f3a;
-  --well: #1a2421;
-  --line: #4a5a54;
-  --chalk: #efede3;
-  --chalk-dim: #b9bfb4;
-  --sisal: #d2b07a;
-  --ok: #6fd08c;
-  --bad: #ff8a7a;
+  /* Neon arcade: a dark cabinet room, lit by the games themselves. */
+  --slate: #120f26;
+  --slate-lift: #1f1a3d;
+  --well: #0a0818;
+  --line: #3a3466;
+  --chalk: #f5f2ff;
+  --chalk-dim: #aaa4cf;
+  --sisal: #36e3ff;         /* the main neon: focus, the current turn, primary buttons */
+  --accent-2: #ff3fb4;      /* the second neon, for the marquee and backdrop glow */
+  --gold: #ffd23f;          /* wins */
+  --ok: #4dffa0;
+  --bad: #ff5c6c;
   /* Player colours stay distinct for colourblind players, so green only ever means success. */
-  --p0: #e0483c;
-  --p0-text: #ff8a7a;
-  --p1: #6db3ea;
-  --p2: #ebc94f;
-  --p3: #c39bea;
-  --tile-a: #2f3f3a;
-  --tile-b: #26332f;
-  --tile-ink: #b9bfb4;
+  --p0: #ff4d5e;
+  --p0-text: #ff7d8a;
+  --p1: #4dc3ff;
+  --p2: #ffd23f;
+  --p3: #b98cff;
+  --tile-a: #1d1838;
+  --tile-b: #151130;
+  --tile-ink: #aaa4cf;
   --ladder: #d2b07a;
   --snake: #e0483c;
   --snake-belly: #ebc94f;
@@ -64,16 +67,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .btn:active:not(:disabled) { transform: translateY(1px); background: var(--slate-lift); }
 .btn:disabled { opacity: 0.4; }
 .btn-primary, .btn.on { border-color: var(--sisal); background: var(--sisal); color: var(--well); }
-.btn-primary:active:not(:disabled) { background: #b9975f; }
+.btn-primary:active:not(:disabled) { filter: brightness(0.88); }
 .btn-large { min-height: 64px; font-size: 1.3rem; }
-
-/* The menu and setup screens share the stage's lamp light: a warm wash from the upper left and a soft vignette. */
-.menu, .setup {
-  background:
-    radial-gradient(ellipse 70% 60% at 28% 22%, rgb(240 196 120 / 0.07), transparent 70%),
-    radial-gradient(ellipse 120% 100% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.22)),
-    var(--slate);
-}
 
 /* Setup screens */
 .setup {
@@ -155,13 +150,10 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 }
 /* A mat's printed border, and the slightly uneven way mats land on a table. */
 .game-card::after { content: ""; position: absolute; inset: 5px; border: 2px solid currentColor; border-radius: 6px; opacity: 0.55; pointer-events: none; }
-.game-card:nth-child(3n + 1) { transform: rotate(-0.5deg); }
-.game-card:nth-child(4n + 2) { transform: rotate(0.6deg); }
-.game-card:nth-child(5n + 3) { transform: rotate(-0.3deg); }
 .game-card:active:not(:disabled) { transform: scale(0.98); }
 .game-card:disabled { opacity: 0.4; }
 /* A card left alone on the last row stretches across it, so the table has no gap. */
-.game-card:last-child:nth-child(3n + 1) { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: center; transform: rotate(-0.2deg); }
+.game-card:last-child:nth-child(3n + 1) { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: center; }
 .game-card-mark { width: clamp(44px, 9vmin, 76px); height: clamp(44px, 9vmin, 76px); }
 .game-card-mark svg { display: block; width: 100%; height: 100%; }
 .game-card-text { display: grid; gap: 2px; min-width: 0; }
@@ -184,7 +176,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(ellipse 58% 58% at 38% 40%, rgb(240 196 120 / 0.09), transparent);
+  background: radial-gradient(ellipse 60% 60% at 45% 42%, rgb(140 110 255 / 0.08), transparent);
 }
 .board {
   --size: var(--board-size);
@@ -198,7 +190,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 }
 .board svg { display: block; width: 100%; height: 100%; }
 .tile-number { fill: var(--tile-ink); font: 600 28px var(--font-body); paint-order: stroke; stroke: var(--tile-a); stroke-width: 6px; stroke-linejoin: round; }
-.tile-finish { fill: var(--sisal); }
+.tile-finish { fill: var(--gold); }
 .tile-finish-number { fill: var(--well); font: 34px var(--font-display); }
 
 .token {
@@ -332,7 +324,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .feed-line.on .feed-dot { background: var(--ok); }
 .feed-line.busy .feed-dot { background: var(--sisal); }
 .btn.board-btn { flex: none; min-height: 44px; min-width: 64px; padding: 0 8px; font-size: 1rem; }
-.panel > .feed-line { position: sticky; bottom: 0; z-index: 3; padding-block: 2px; background: var(--slate); }
+.panel > .feed-line { position: sticky; bottom: 0; z-index: 3; padding-block: 2px; background: #15112e; }
 
 /* Tug of War */
 .tug { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; min-height: 0; }
@@ -422,7 +414,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .golf-table .golf-name { width: 22%; padding: 0 8px; overflow: hidden; font-size: 1.12rem; font-weight: 600; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .golf-table .golf-sum { width: 9%; background: var(--slate-lift); }
 .golf-table .golf-total { color: var(--sisal); }
-.golf-table .golf-now { background: rgb(210 176 122 / 0.16); color: var(--chalk); }
+.golf-table .golf-now { background: rgb(54 227 255 / 0.14); color: var(--chalk); }
 .golf-table thead .golf-now { color: var(--sisal); }
 .golf-table .golf-live { color: var(--sisal); font-style: italic; }
 .golf-table .golf-current .golf-name { color: var(--sisal); }
@@ -443,8 +435,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .paint-board svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .paint-backing { fill: var(--well); stroke: var(--sisal); stroke-width: 4; }
 .paint-zone { stroke: var(--well); stroke-width: 1.5; transition: fill 0.25s; }
-.paint-dark { fill: #23352d; }
-.paint-light { fill: #3a5146; }
+.paint-dark { fill: #1a1636; }
+.paint-light { fill: #2a2452; }
 .paint-zone.paint-owner-0 { fill: var(--p0); }
 .paint-zone.paint-owner-1 { fill: var(--p1); }
 .paint-zone.paint-owner-2 { fill: var(--p2); }
@@ -471,10 +463,10 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .bubble-board svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .bb-backing { fill: var(--well); stroke: var(--sisal); stroke-width: 4; }
 .bb-zone { stroke: var(--well); stroke-width: 1.5; }
-.bb-single.bb-dark { fill: #1b2f27; }
-.bb-single.bb-light { fill: #2c4639; }
-.bb-ring.bb-dark { fill: #6d2019; }
-.bb-ring.bb-light { fill: #a2392c; }
+.bb-single.bb-dark { fill: #17132f; }
+.bb-single.bb-light { fill: #251f4a; }
+.bb-ring.bb-dark { fill: #6a1250; }
+.bb-ring.bb-light { fill: #b0237f; }
 .bb-medallion { fill: var(--slate-lift); stroke: var(--line); stroke-width: 2; }
 .bb-number { fill: var(--chalk-dim); font: 700 26px var(--font-body); text-anchor: middle; dominant-baseline: central; }
 .bubble-layer, .bubble-darts { position: absolute; inset: 0; pointer-events: none; }
@@ -536,7 +528,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   padding: 8px 14px;
   border: 3px solid var(--sisal);
   border-radius: 12px;
-  background: rgb(26 36 33 / 0.92);
+  background: rgb(10 8 24 / 0.92);
   pointer-events: none;
 }
 .bubble-prep-count { font: 800 calc(var(--size) * 0.075) / 1 var(--font-display); }
@@ -765,8 +757,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .cq-board svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .cq-backing { fill: var(--well); stroke: var(--sisal); stroke-width: 4; }
 .cq-zone { stroke: var(--well); stroke-width: 1.5; transition: fill 0.25s, opacity 0.2s; }
-.cq-dark { fill: #6d7570; }
-.cq-light { fill: #868e88; }
+.cq-dark { fill: #4a4475; }
+.cq-light { fill: #615a92; }
 .cq-zone.cq-owner-0 { fill: var(--p0); }
 .cq-zone.cq-owner-1 { fill: var(--p1); }
 .cq-zone.cq-owner-2 { fill: var(--p2); }
@@ -801,8 +793,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .cb-board svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .cb-backing { fill: var(--well); stroke: var(--line); stroke-width: 4; }
 .cb-zone { stroke: var(--well); stroke-width: 1.5; }
-.cb-dark { fill: #29362f; }
-.cb-light { fill: #3d4d44; }
+.cb-dark { fill: #1a1636; }
+.cb-light { fill: #2a2452; }
 .cb-off { opacity: 0.4; }
 .cb-zone.cb-on { fill: #f0d24a; stroke: #6b5a10; }
 .cb-number { fill: var(--chalk); font: 700 32px var(--font-body); text-anchor: middle; dominant-baseline: central; }
@@ -883,13 +875,13 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(ellipse 55% 45% at 50% 34%, rgb(235 201 79 / 0.16), transparent 70%),
-    rgb(26 36 33 / 0.94);
+    radial-gradient(ellipse 55% 45% at 50% 34%, rgb(255 210 63 / 0.18), transparent 70%),
+    rgb(10 8 24 / 0.94);
 }
 .winner-card { width: min(620px, 100%); display: grid; justify-items: stretch; gap: 18px; text-align: center; animation: winner-in 0.45s cubic-bezier(.2,.8,.2,1) both; }
-.winner-trophy { justify-self: center; width: clamp(96px, 20vmin, 170px); height: auto; margin-bottom: -6px; filter: drop-shadow(0 0 26px rgb(235 201 79 / 0.45)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.5)); animation: winner-trophy 0.6s 0.1s cubic-bezier(.2,.8,.2,1) both; }
-.winner-card h2 { color: var(--p2); font-size: clamp(2.4rem, 8vmin, 4.2rem); overflow-wrap: anywhere; text-shadow: 0 3px 0 #3a2414, 0 0 28px rgb(235 201 79 / 0.3); }
-.winner-card h2.winner-lost { color: var(--bad); text-shadow: 0 3px 0 #3a2414; }
+.winner-trophy { justify-self: center; width: clamp(96px, 20vmin, 170px); height: auto; margin-bottom: -6px; filter: drop-shadow(0 0 30px rgb(255 210 63 / 0.6)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.5)); animation: winner-trophy 0.6s 0.1s cubic-bezier(.2,.8,.2,1) both; }
+.winner-card h2 { color: var(--p2); font-size: clamp(2.4rem, 8vmin, 4.2rem); overflow-wrap: anywhere; text-shadow: 0 4px 0 #6a1250, 0 0 30px rgb(255 210 63 / 0.55); }
+.winner-card h2.winner-lost { color: var(--bad); text-shadow: 0 4px 0 #3a0a1c, 0 0 30px rgb(255 92 108 / 0.5); }
 @keyframes winner-in {
   from { opacity: 0; transform: translateY(14px) scale(0.98); }
   to { opacity: 1; transform: none; }
@@ -906,7 +898,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .winner-standings b { font: 400 1.5rem var(--font-display); font-variant-numeric: tabular-nums; }
 
 .quit-dialog { width: min(520px, calc(100vw - 48px)); padding: 0; border: 4px solid var(--sisal); border-radius: 8px; background: var(--slate); color: var(--chalk); }
-.quit-dialog::backdrop { background: rgb(26 36 33 / 0.8); }
+.quit-dialog::backdrop { background: rgb(10 8 24 / 0.82); backdrop-filter: blur(4px); }
 .quit-card { display: grid; gap: 14px; padding: 28px; text-align: center; }
 .quit-card h2 { color: var(--sisal); font-size: clamp(1.9rem, 5.4vmin, 2.8rem); }
 .quit-card p { margin: 0; }
@@ -923,7 +915,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .x01-players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .x01-players[data-count="1"] { grid-template-columns: minmax(0, 520px); justify-content: center; }
 .x01-player { position: relative; display: grid; justify-items: center; gap: 4px; min-width: 0; padding: 14px 12px 16px; border: 3px solid transparent; border-top: 8px solid var(--who); border-radius: 10px; background: var(--slate-lift); }
-.x01-now { border-color: var(--sisal); border-top-color: var(--who); box-shadow: 0 0 22px rgb(210 176 122 / 0.25); }
+.x01-now { border-color: var(--sisal); border-top-color: var(--who); box-shadow: 0 0 22px rgb(54 227 255 / 0.3); }
 .x01-winner { border-color: var(--sisal); border-top-color: var(--who); }
 .x01-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1.4rem; font-weight: 700; }
 .x01-remaining { color: var(--chalk); font: clamp(3rem, 13vmin, 8rem) / 1 var(--font-display); font-variant-numeric: tabular-nums; }
@@ -942,9 +934,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
     grid-template-areas: "turn scores" "controls controls" "feed feed";
     align-content: start;
     gap: 10px 20px;
-    padding: 10px 0 0;
-    border-top: 2px solid var(--line);
-    border-left: 0;
+    padding: 12px 14px;
     overflow: visible;
   }
   .turn { grid-area: turn; }
@@ -988,4 +978,178 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   .cq-flash { animation: none; }
   .cq-zone { transition: none; }
   .winner-card, .winner-trophy { animation: none; }
+}
+
+/* ===== Neon arcade ===== */
+
+/* The room: two neon glows on the far wall and faint scanlines over everything. */
+body {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% -12%, rgb(255 63 180 / 0.18), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 105% 105%, rgb(54 227 255 / 0.12), transparent 70%),
+    var(--well);
+  background-attachment: fixed;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.022) 0 1px, transparent 1px 3px);
+}
+
+/* A synthwave floor fading into the dark under the menu and setup screens. */
+.menu, .setup { position: relative; isolation: isolate; }
+.menu::before, .setup::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 0;
+  z-index: -1;
+  height: 42%;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 63 180 / 0.32) 2px, transparent 2px),
+    linear-gradient(90deg, rgb(255 63 180 / 0.32) 2px, transparent 2px);
+  background-size: 64px 48px;
+  background-position: center bottom;
+  transform: perspective(360px) rotateX(58deg);
+  transform-origin: center bottom;
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+}
+
+/* Headings */
+.menu-head h1 {
+  color: #fff;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 6px rgb(255 255 255 / 0.5), 0 0 18px var(--accent-2), 0 0 42px rgb(255 63 180 / 0.6), 3px 3px 0 #6a1250;
+}
+.setup-card h1 { color: #fff; text-shadow: 0 0 18px rgb(54 227 255 / 0.55), 3px 3px 0 #0f4f63; }
+.eyebrow { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.92rem; }
+
+/* Buttons: smoked glass, and a lit cyan key for the main action. */
+.btn {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.02));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.btn:active:not(:disabled) { background: rgb(54 227 255 / 0.12); }
+@media (hover: hover) {
+  .btn:hover:not(:disabled):not(.btn-primary):not(.on) { border-color: #5a52a0; }
+}
+.btn-primary, .btn.on {
+  border-color: #8af2ff;
+  background: linear-gradient(180deg, #7ef1ff, #1cc8ec);
+  color: #04131c;
+  box-shadow: 0 0 18px rgb(54 227 255 / 0.45), inset 0 -3px 0 rgb(0 0 0 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+.btn-primary:disabled { box-shadow: none; }
+
+/* Player colours glow like LEDs. */
+.swatch-0 { box-shadow: 0 0 10px var(--p0); }
+.swatch-1 { box-shadow: 0 0 10px var(--p1); }
+.swatch-2 { box-shadow: 0 0 10px var(--p2); }
+.swatch-3 { box-shadow: 0 0 10px var(--p3); }
+.beginner-tag { border-color: var(--p3); color: var(--p3); }
+.feed-line.on .feed-dot { box-shadow: 0 0 10px var(--ok); }
+.feed-line.busy .feed-dot { box-shadow: 0 0 10px var(--sisal); }
+.feed-dot { box-shadow: 0 0 10px var(--bad); }
+
+/* Name entry: lit boxes rather than ruled lines. */
+.name-field input {
+  padding: 0 16px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: rgb(10 8 24 / 0.7);
+}
+.name-field input:focus { border-color: var(--sisal); box-shadow: 0 0 0 3px rgb(54 227 255 / 0.18), 0 0 18px rgb(54 227 255 / 0.25); }
+
+/* Setup screens sit on a glass card. */
+.setup-card {
+  padding: clamp(20px, 4vmin, 36px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgb(31 26 61 / 0.88), rgb(14 11 32 / 0.92));
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.07);
+  backdrop-filter: blur(6px);
+}
+#players .setup-card, #bull .setup-card { width: min(640px, 100%); }
+
+/* The menu: a row of lit cabinet marquees, each glowing in its game's colour. */
+.game-card {
+  border: 2px solid var(--neon);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 80% 120% at 0% 0%, color-mix(in srgb, var(--neon) 22%, transparent), transparent 70%),
+    linear-gradient(180deg, #1c173a, #0e0b21);
+  color: var(--chalk);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--neon) 38%, transparent), inset 0 0 22px color-mix(in srgb, var(--neon) 14%, transparent);
+  transition: transform 0.12s, box-shadow 0.15s;
+}
+.game-card::after { display: none; }
+.game-card-mark { color: var(--neon); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--neon) 70%, transparent)); }
+.game-card-name { color: var(--neon); text-shadow: 0 0 14px color-mix(in srgb, var(--neon) 55%, transparent); }
+.game-card-blurb { color: var(--chalk-dim); font-weight: 600; }
+@media (hover: hover) {
+  .game-card:hover:not(:disabled) { box-shadow: 0 0 26px color-mix(in srgb, var(--neon) 60%, transparent), inset 0 0 26px color-mix(in srgb, var(--neon) 20%, transparent); }
+}
+.game-card:disabled { opacity: 0.35; box-shadow: none; }
+.setup-mat {
+  padding: 12px;
+  border: 2px solid var(--neon);
+  border-radius: 16px;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--neon) 25%, transparent), #0e0b21 75%);
+  color: var(--neon);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--neon) 45%, transparent);
+}
+
+/* The scoreboard: a glass console beside the stage. */
+.panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgb(31 26 61 / 0.9), rgb(18 15 40 / 0.9));
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.07);
+}
+:root { --board-size: min(calc(100dvh - 24px), calc(100vw - 388px)); }
+.turn h2[data-who] { border-left-width: 6px; border-radius: 3px; text-shadow: 0 0 20px color-mix(in srgb, var(--who) 45%, transparent); }
+.pip {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgb(10 8 24 / 0.5);
+}
+.pip.done {
+  border-color: var(--sisal);
+  background: rgb(54 227 255 / 0.12);
+  color: #fff;
+  box-shadow: 0 0 12px rgb(54 227 255 / 0.25);
+}
+.score { padding: 4px 10px; border-bottom-color: rgb(58 52 102 / 0.7); }
+.score:first-child { border-top-color: rgb(58 52 102 / 0.7); }
+.score.current { border-radius: 10px; background: linear-gradient(90deg, rgb(54 227 255 / 0.16), rgb(54 227 255 / 0.03)); border-bottom-color: transparent; }
+.score.current .score-name { color: var(--sisal); }
+
+/* Boards and frames light up in the accent. */
+.board { border: 3px solid var(--sisal); border-radius: 8px; box-shadow: 0 0 26px rgb(54 227 255 / 0.3); }
+.paint-backing, .bb-backing, .cq-backing { filter: drop-shadow(0 0 10px rgb(54 227 255 / 0.45)); }
+.tug-track, .c4-frame, .golf-target { box-shadow: 0 0 22px rgb(54 227 255 / 0.3), inset 0 0 18px rgb(54 227 255 / 0.08); }
+.box-card, .x01-player, .heist-entry, .cb-wire { border-radius: 14px; }
+.snk-table { border-color: #3b2412; box-shadow: inset 0 0 40px rgb(0 0 0 / 0.4), 0 0 26px rgb(77 255 160 / 0.18); }
+
+/* Overlays */
+.manual { border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(180deg, #1f1a3d, #110e27); box-shadow: 0 18px 50px rgb(0 0 0 / 0.6), 0 0 24px rgb(54 227 255 / 0.15); }
+.quit-dialog { border: 2px solid var(--accent-2); border-radius: 20px; background: linear-gradient(180deg, #1f1a3d, #110e27); box-shadow: 0 0 34px rgb(255 63 180 / 0.35); }
+.quit-card h2 { color: #fff; text-shadow: 0 0 18px rgb(255 63 180 / 0.6); }
+
+@media (orientation: portrait) {
+  :root { --board-size: min(calc(100vw - 24px), calc(100dvh - 440px)); }
+  .panel { border-radius: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn, .game-card { transition: none; }
 }

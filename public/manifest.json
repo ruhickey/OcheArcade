@@ -3,6 +3,6 @@
   "short_name": "Oche Arcade",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#26332f",
-  "theme_color": "#26332f"
+  "background_color": "#0a0818",
+  "theme_color": "#0a0818"
 }

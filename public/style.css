@@ -56,7 +56,7 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   padding: 0 16px;
   border: 2px solid var(--line);
   border-radius: 6px;
-  background: transparent;
+  background: rgb(239 237 227 / 0.045);
   color: var(--chalk);
   font: 600 1.1rem var(--font-body);
   touch-action: manipulation;
@@ -66,6 +66,14 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .btn-primary, .btn.on { border-color: var(--sisal); background: var(--sisal); color: var(--well); }
 .btn-primary:active:not(:disabled) { background: #b9975f; }
 .btn-large { min-height: 64px; font-size: 1.3rem; }
+
+/* The menu and setup screens share the stage's lamp light: a warm wash from the upper left and a soft vignette. */
+.menu, .setup {
+  background:
+    radial-gradient(ellipse 70% 60% at 28% 22%, rgb(240 196 120 / 0.07), transparent 70%),
+    radial-gradient(ellipse 120% 100% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.22)),
+    var(--slate);
+}
 
 /* Setup screens */
 .setup {
@@ -152,6 +160,8 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .game-card:nth-child(5n + 3) { transform: rotate(-0.3deg); }
 .game-card:active:not(:disabled) { transform: scale(0.98); }
 .game-card:disabled { opacity: 0.4; }
+/* A card left alone on the last row stretches across it, so the table has no gap. */
+.game-card:last-child:nth-child(3n + 1) { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: center; transform: rotate(-0.2deg); }
 .game-card-mark { width: clamp(44px, 9vmin, 76px); height: clamp(44px, 9vmin, 76px); }
 .game-card-mark svg { display: block; width: 100%; height: 100%; }
 .game-card-text { display: grid; gap: 2px; min-width: 0; }
@@ -238,6 +248,12 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 }
 .turn { display: grid; gap: 10px; }
 .turn h2 { font-size: clamp(1.8rem, 4.6vmin, 2.7rem); overflow-wrap: anywhere; }
+/* Whose turn it is, in their colour, so it reads from the oche as well as the name does. */
+.turn h2[data-who] { padding-left: 16px; border-left: 8px solid var(--who); border-radius: 2px; }
+.turn h2[data-who="0"] { --who: var(--p0); }
+.turn h2[data-who="1"] { --who: var(--p1); }
+.turn h2[data-who="2"] { --who: var(--p2); }
+.turn h2[data-who="3"] { --who: var(--p3); }
 .pips { display: flex; gap: 6px; }
 .pip {
   flex: 1;
@@ -274,6 +290,10 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
 .controls { display: flex; flex-wrap: wrap; gap: 6px; }
 .controls .btn { flex: 1 1 0; min-width: 0; padding: 0 4px; line-height: 1.05; }
 .controls #next { flex-basis: 100%; min-height: 60px; font-size: 1.3rem; }
+/* Beside the stage the panel is narrow, so the other buttons pair up and an odd one out takes the row. */
+.panel .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.panel .controls #next, .panel .controls:has(#sound[hidden]) #quit { grid-column: 1 / -1; }
+.panel .controls .btn { min-height: 48px; white-space: nowrap; }
 
 /* Entering a dart by hand is the exception, so it slides over the panel only when asked for. */
 .manual {
@@ -862,10 +882,23 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(26 36 33 / 0.94);
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 34%, rgb(235 201 79 / 0.16), transparent 70%),
+    rgb(26 36 33 / 0.94);
 }
-.winner-card { width: min(620px, 100%); display: grid; gap: 18px; text-align: center; }
-.winner-card h2 { color: var(--sisal); font-size: clamp(2.4rem, 8vmin, 4.2rem); overflow-wrap: anywhere; }
+.winner-card { width: min(620px, 100%); display: grid; justify-items: stretch; gap: 18px; text-align: center; animation: winner-in 0.45s cubic-bezier(.2,.8,.2,1) both; }
+.winner-trophy { justify-self: center; width: clamp(96px, 20vmin, 170px); height: auto; margin-bottom: -6px; filter: drop-shadow(0 0 26px rgb(235 201 79 / 0.45)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.5)); animation: winner-trophy 0.6s 0.1s cubic-bezier(.2,.8,.2,1) both; }
+.winner-card h2 { color: var(--p2); font-size: clamp(2.4rem, 8vmin, 4.2rem); overflow-wrap: anywhere; text-shadow: 0 3px 0 #3a2414, 0 0 28px rgb(235 201 79 / 0.3); }
+.winner-card h2.winner-lost { color: var(--bad); text-shadow: 0 3px 0 #3a2414; }
+@keyframes winner-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes winner-trophy {
+  0% { opacity: 0; transform: translateY(18px) scale(0.6) rotate(-8deg); }
+  70% { opacity: 1; transform: translateY(-4px) scale(1.06) rotate(2deg); }
+  100% { transform: none; }
+}
 .winner-actions { display: grid; gap: 10px; }
 .winner-standings { margin: 0; padding: 0; list-style: none; }
 .winner-standings:empty { display: none; }
@@ -917,6 +950,9 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   .turn { grid-area: turn; }
   .scores { grid-area: scores; }
   .controls { grid-area: controls; }
+  .panel .controls { display: flex; }
+  .game-card:last-child:nth-child(3n + 1) { grid-column: auto; grid-template-columns: auto minmax(0, 1fr); justify-content: normal; }
+  .game-card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: center; }
   .controls #next { flex-basis: 0; min-height: 52px; font-size: 1.1rem; }
   .panel > .feed-line { grid-area: feed; }
   .score { min-height: 40px; }
@@ -951,4 +987,5 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; line
   .heist-door { transition: none; }
   .cq-flash { animation: none; }
   .cq-zone { transition: none; }
+  .winner-card, .winner-trophy { animation: none; }
 }

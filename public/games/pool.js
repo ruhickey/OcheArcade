@@ -37,7 +37,7 @@ function buildRack(game, side) {
   name.textContent = sideNames(game, side);
   const count = document.createElement('span');
   count.className = 'pool-count';
-  count.textContent = `${state.thrown} darts`;
+  count.textContent = `${state.thrown} ${state.thrown === 1 ? 'dart' : 'darts'}`;
   head.append(name, count);
 
   const balls = document.createElement('div');

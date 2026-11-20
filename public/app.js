@@ -83,6 +83,7 @@ function moveMessage(game, module) {
 function renderPanel(game, canUndo) {
   const module = MODULES[game.type];
   $('turn-name').textContent = game.players[game.current].name;
+  $('turn-name').dataset.who = module.swatch(game.players[game.current], game.current);
   $('message').textContent = moveMessage(game, module);
 
   $('dart-pips').replaceChildren(...Array.from({ length: state.dartsPerTurn }, (_, i) => {
@@ -119,6 +120,10 @@ function renderPanel(game, canUndo) {
 
   $('winner').hidden = game.phase !== 'over';
   if (game.phase === 'over') $('winner-name').textContent = game.winnerText;
+  // A draw, or a bomb that went off, gets no trophy.
+  const won = game.winner !== null && game.winner !== undefined && game.winner !== false;
+  $('winner-trophy').hidden = !won;
+  $('winner-name').classList.toggle('winner-lost', game.winner === false);
   $('winner-undo').hidden = !canUndo;
   // Games that end on scores list them, because the banner covers the screen.
   const standings = game.phase === 'over' && module.standings ? module.standings(game) : [];
